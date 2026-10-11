@@ -1,0 +1,740 @@
+<title>Interchange Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column of frosted glass panels floating over a soft sky, amber and mint light field. Search first, then a dark glass station board for the route, then trip cards. The selected trip opens a map beside its legs. */
+:root {
+  --bg: #E4EBF3; --bg-a: #8DBFEC; --bg-b: #F4CC8B; --bg-c: #9DDBC6;
+  --glass: rgba(255,255,255,.55); --glass-2: rgba(255,255,255,.36); --glass-hi: rgba(255,255,255,.84); --glass-solid: #F3F7FB;
+  --glass-line: rgba(255,255,255,.88); --line: rgba(22,50,84,.15);
+  --shadow: 0 10px 34px rgba(30,64,104,.14), inset 0 1px 0 rgba(255,255,255,.75);
+  --sel-glow: 0 16px 44px rgba(11,92,173,.26);
+  --ink: #0E1C2B; --muted: #465A6F;
+  --accent: #0B5CAD; --accent-ink: #FFFFFF; --accent-soft: rgba(11,92,173,.13);
+  --board-a: rgba(9,21,36,.90); --board-b: rgba(20,45,72,.82); --board-ink: #F2F5F8; --board-amber: #FFB938;
+  --warn: #8F5200; --warn-soft: rgba(244,170,40,.24); --bad: #B3261E;
+  --leg-a: #0B5CAD; --leg-b: #C2410C; --leg-c: #17803F; --leg-d: #7A3FB0;
+  --sea-a: #CFE3F3; --sea-b: #B2D0E8; --land: #F6F3EA; --state: #C2CAD3; --coast: #6C8CA8; --coast-glow: rgba(255,255,255,.6);
+  --grat: rgba(255,255,255,.7); --rail: #8E9DAE; --rail-o: .3; --state-lbl: #7D8E9F; --city: #5F7185; --route-casing: #FFFFFF;
+  --chip-bg: rgba(255,255,255,.95); --chip-line: rgba(14,28,43,.22);
+  --f-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --bg: #060C13; --bg-a: #1B5F99; --bg-b: #86570F; --bg-c: #0E6B5B;
+  --glass: rgba(20,33,49,.54); --glass-2: rgba(255,255,255,.06); --glass-hi: rgba(24,38,56,.86); --glass-solid: #121E2C;
+  --glass-line: rgba(255,255,255,.15); --line: rgba(255,255,255,.12);
+  --shadow: 0 14px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.09);
+  --sel-glow: 0 16px 48px rgba(94,169,242,.22);
+  --ink: #E9EFF6; --muted: #9AABBD;
+  --accent: #66B0F5; --accent-ink: #07121D; --accent-soft: rgba(102,176,245,.16);
+  --board-a: rgba(4,10,17,.88); --board-b: rgba(14,32,52,.78); --board-ink: #F2F5F8; --board-amber: #FFB938;
+  --warn: #F0B04E; --warn-soft: rgba(240,176,78,.18); --bad: #FF8F86;
+  --leg-a: #5EA9F2; --leg-b: #FF9A5C; --leg-c: #55C285; --leg-d: #C79BFF;
+  --sea-a: #0B1A2A; --sea-b: #08131F; --land: #162739; --state: #2B4259; --coast: #4C7BA3; --coast-glow: rgba(94,169,242,.18);
+  --grat: rgba(255,255,255,.07); --rail: #3E5A75; --state-lbl: #5F7A93; --city: #7E97AF; --route-casing: #0A1520;
+  --chip-bg: rgba(14,26,40,.94); --chip-line: rgba(255,255,255,.22);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #060C13; --bg-a: #1B5F99; --bg-b: #86570F; --bg-c: #0E6B5B;
+  --glass: rgba(20,33,49,.54); --glass-2: rgba(255,255,255,.06); --glass-hi: rgba(24,38,56,.86); --glass-solid: #121E2C;
+  --glass-line: rgba(255,255,255,.15); --line: rgba(255,255,255,.12);
+  --shadow: 0 14px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.09);
+  --sel-glow: 0 16px 48px rgba(94,169,242,.22);
+  --ink: #E9EFF6; --muted: #9AABBD;
+  --accent: #66B0F5; --accent-ink: #07121D; --accent-soft: rgba(102,176,245,.16);
+  --board-a: rgba(4,10,17,.88); --board-b: rgba(14,32,52,.78); --board-ink: #F2F5F8; --board-amber: #FFB938;
+  --warn: #F0B04E; --warn-soft: rgba(240,176,78,.18); --bad: #FF8F86;
+  --leg-a: #5EA9F2; --leg-b: #FF9A5C; --leg-c: #55C285; --leg-d: #C79BFF;
+  --sea-a: #0B1A2A; --sea-b: #08131F; --land: #162739; --state: #2B4259; --coast: #4C7BA3; --coast-glow: rgba(94,169,242,.18);
+  --grat: rgba(255,255,255,.07); --rail: #3E5A75; --state-lbl: #5F7A93; --city: #7E97AF; --route-casing: #0A1520;
+  --chip-bg: rgba(14,26,40,.94); --chip-line: rgba(255,255,255,.22);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+.bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(58vmax 46vmax at 10% 6%, var(--bg-a) 0%, transparent 62%),
+    radial-gradient(48vmax 40vmax at 94% 18%, var(--bg-b) 0%, transparent 64%),
+    radial-gradient(56vmax 48vmax at 58% 104%, var(--bg-c) 0%, transparent 62%),
+    var(--bg); }
+.wrap { position: relative; max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 56px; display: flex; flex-direction: column; gap: 16px; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* glass surfaces: solid fallback first, frosted where backdrop-filter exists */
+.search, .trip, .hub, .panel, .about, .counts-wrap { background: var(--glass-solid); border: 1px solid var(--glass-line); box-shadow: var(--shadow); }
+.board { background: linear-gradient(120deg, var(--board-a), var(--board-b)); border: 1px solid rgba(255,255,255,.16); box-shadow: var(--shadow); }
+.sugg, .mapctl button, .mapcap, .mapscale, .tabs { background: var(--glass-solid); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .search, .trip, .hub, .panel, .about { background: var(--glass); -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%); }
+  .board { -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%); }
+  .sugg, .mapctl button, .mapcap, .mapscale, .tabs { background: var(--glass-hi); -webkit-backdrop-filter: blur(14px) saturate(150%); backdrop-filter: blur(14px) saturate(150%); }
+}
+
+#out { display: flex; flex-direction: column; gap: 14px; }
+.top h1 { font-family: var(--f-display); font-weight: 700; font-size: 36px; line-height: 1; letter-spacing: .01em; margin: 0; text-transform: uppercase; }
+.top p { margin: 8px 0 0; color: var(--muted); max-width: 62ch; }
+
+.search { border-radius: 16px; padding: 16px; display: grid; gap: 12px 10px; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) 168px auto; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; position: relative; }
+.field label, .opt label { font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.field input, .opt select, .opt input { height: 44px; border: 1px solid var(--line); border-radius: 10px; background: var(--glass-2); padding: 0 12px; width: 100%; min-width: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+.field input:focus, .opt select:focus, .opt input:focus { border-color: var(--accent); }
+.field input::placeholder { color: var(--muted); }
+.swap { height: 44px; width: 44px; border: 1px solid var(--line); border-radius: 10px; background: var(--glass-2); cursor: pointer; display: grid; place-items: center; color: var(--muted); }
+.swap:hover { color: var(--accent); border-color: var(--accent); }
+.go { height: 44px; padding: 0 22px; border: 1px solid rgba(255,255,255,.35); border-radius: 10px; background: var(--accent); background-image: linear-gradient(180deg, color-mix(in srgb, var(--accent) 88%, #fff), var(--accent)); color: var(--accent-ink); font-weight: 600; cursor: pointer; letter-spacing: .02em; box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.4); }
+.go:hover { filter: brightness(1.07); }
+.sugg { position: absolute; top: 100%; left: 0; right: 0; z-index: 30; margin: 6px 0 0; padding: 5px; list-style: none; border: 1px solid var(--glass-line); border-radius: 12px; box-shadow: 0 16px 40px rgba(10,24,44,.26); max-height: 290px; overflow-y: auto; }
+.sugg li { padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.sugg li[aria-selected="true"], .sugg li:hover { background: var(--accent-soft); }
+.sugg small { color: var(--muted); margin-left: 6px; }
+
+.opts { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; }
+.opts summary { cursor: pointer; font-weight: 600; color: var(--muted); list-style: none; display: inline-flex; gap: 6px; align-items: center; }
+.opts summary::-webkit-details-marker { display: none; }
+.opts summary::before { content: "+"; font-family: var(--f-data); width: 14px; }
+.opts[open] summary::before { content: "−"; }
+.optgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 12px; }
+.opt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.rates { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; }
+.rates .opt input { font-family: var(--f-data); }
+.hint { grid-column: 1 / -1; margin: 0; font-size: 13px; color: var(--muted); }
+
+.board { border-radius: 16px; color: var(--board-ink); padding: 16px 20px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; }
+.board .route { font-family: var(--f-display); font-weight: 600; font-size: 36px; line-height: 1.05; text-transform: uppercase; letter-spacing: .01em; min-width: 0; overflow-wrap: anywhere; }
+.board .route i { font-style: normal; color: var(--board-amber); padding-inline: .25em; }
+.board .meta { font-family: var(--f-data); font-size: 13px; color: var(--board-amber); }
+.counts { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; color: var(--muted); padding-inline: 4px; }
+.counts b { font-family: var(--f-data); font-weight: 500; color: var(--ink); }
+
+.tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--glass-line); border-radius: 14px; align-self: flex-start; box-shadow: var(--shadow); max-width: 100%; }
+.tab { border: 0; background: none; padding: 8px 14px; cursor: pointer; font-weight: 600; color: var(--muted); border-radius: 10px; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--accent); background: var(--glass-solid); box-shadow: 0 2px 10px rgba(20,50,90,.16), inset 0 1px 0 rgba(255,255,255,.5); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { display: inline-flex; gap: 8px; align-items: center; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--glass-line); border-radius: 999px; padding: 4px 12px; font-weight: 600; cursor: pointer; }
+.list { display: flex; flex-direction: column; gap: 14px; }
+
+.trip { border-radius: 16px; overflow: hidden; transition: box-shadow .2s, border-color .2s; }
+.trip.sel { border-color: var(--accent); box-shadow: 0 0 0 1.5px var(--accent), var(--sel-glow); }
+.trip:not(.sel) .trip-main { cursor: pointer; }
+.trip-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 13px 18px; border-bottom: 1px solid var(--line); background: var(--glass-2); }
+.dur { font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1; }
+.chg { font-weight: 600; color: var(--muted); }
+.fare { margin-left: auto; font-family: var(--f-data); font-size: 15px; font-weight: 500; }
+.fare small { color: var(--muted); font-family: var(--f-body); font-size: 12px; margin-right: 4px; }
+.copy, .viewmap { border-radius: 9px; padding: 6px 11px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.copy { border: 1px solid var(--line); background: var(--glass-2); color: var(--muted); }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+.viewmap { border: 1px solid var(--accent); background: transparent; color: var(--accent); }
+.viewmap:hover { background: var(--accent-soft); }
+.viewmap[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); cursor: default; }
+.trip-body { display: grid; grid-template-columns: minmax(0, 1fr); }
+.trip-main { min-width: 0; }
+.trip-sub { margin: 0; padding: 12px 18px 0; color: var(--muted); font-size: 14px; }
+.legs { list-style: none; margin: 0; padding: 6px 18px 14px; display: flex; flex-direction: column; }
+.leg { padding: 10px 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.train { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.train::before { content: ""; width: 6px; height: 18px; border-radius: 3px; background: var(--lc, var(--line)); align-self: center; }
+.tno { font-family: var(--f-data); font-weight: 500; background: var(--ink); color: var(--bg); padding: 1px 8px; border-radius: 6px; font-size: 13px; }
+.tname { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.ttype { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 7px; background: var(--glass-2); }
+.run { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); gap: 10px; align-items: center; }
+.stop { display: flex; flex-direction: column; min-width: 0; }
+.stop.end { text-align: right; }
+.tm { font-family: var(--f-data); font-weight: 500; font-size: 20px; line-height: 1.1; }
+.dt { font-size: 12.5px; color: var(--muted); }
+.sn { font-weight: 600; overflow-wrap: anywhere; }
+.sn i { font-style: normal; font-family: var(--f-data); font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 4px; }
+.track { display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: var(--f-data); font-size: 12px; color: var(--muted); min-width: 84px; }
+.track::before { content: ""; width: 100%; min-width: 70px; height: 0; border-top: 2px dotted var(--line); }
+.cls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.cls span { font-family: var(--f-data); font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 0 7px; background: var(--glass-2); }
+.cls span.pick { border-color: var(--accent); color: var(--accent); font-weight: 500; background: var(--accent-soft); }
+.gap { margin: 2px 0; padding: 9px 13px; border-radius: 12px; background: var(--glass-2); border: 1px solid var(--line); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.gap b { font-weight: 600; }
+.gap.tight { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+.gap.tight em { color: var(--warn); font-style: normal; font-weight: 600; }
+.notes { margin: 0; padding: 0 18px 14px; font-size: 12.5px; color: var(--warn); }
+
+.via { font-size: 13px; }
+.via summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.via summary span { color: var(--muted); font-weight: 400; margin-left: 6px; }
+.via ol { list-style: none; margin: 8px 0 2px; padding: 0 0 0 12px; border-left: 3px solid var(--lc, var(--line)); display: flex; flex-direction: column; gap: 4px; }
+.via li { display: flex; justify-content: space-between; gap: 12px; min-width: 0; }
+.vn { min-width: 0; overflow-wrap: anywhere; }
+.vn i { font-style: normal; font-family: var(--f-data); font-size: 11.5px; color: var(--muted); margin-left: 5px; }
+.vt { font-family: var(--f-data); font-size: 12px; color: var(--muted); text-align: right; flex: none; }
+.vt small { font-size: 11.5px; margin-left: 4px; }
+
+.hubs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+.hub { border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.hub h3 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 24px; text-transform: uppercase; line-height: 1.1; overflow-wrap: anywhere; }
+.hub h3 i { font-family: var(--f-data); font-size: 12px; font-style: normal; color: var(--muted); margin-left: 6px; text-transform: none; }
+.hub dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13.5px; }
+.hub dt { color: var(--muted); }
+.hub dd { margin: 0; font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+.hub button { align-self: flex-start; border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 9px; padding: 6px 12px; font-weight: 600; cursor: pointer; }
+.hub button:hover { background: var(--accent-soft); }
+
+.panel { border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.panel h2 { margin: 0; font-family: var(--f-display); font-size: 28px; font-weight: 600; text-transform: uppercase; }
+.panel p { margin: 0; max-width: 68ch; }
+.panel ul { margin: 0; padding-left: 18px; }
+.panel a, .about a { color: var(--accent); font-weight: 600; }
+.btn { align-self: flex-start; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: 10px; padding: 9px 16px; font-weight: 600; cursor: pointer; }
+.more { align-self: center; border: 1px solid var(--glass-line); background: var(--glass-hi); border-radius: 12px; padding: 9px 20px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow); }
+.busy { padding: 30px 8px; text-align: center; color: var(--muted); font-family: var(--f-data); }
+.about { border-radius: 16px; padding: 13px 18px; font-size: 13.5px; color: var(--muted); }
+.about summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.about p { margin: 8px 0 0; max-width: 80ch; }
+
+/* map */
+.mapbox { position: relative; height: 350px; background: linear-gradient(165deg, var(--sea-a), var(--sea-b)); border-top: 1px solid var(--line); overflow: hidden; }
+.mapsvg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.mapsvg:active { cursor: grabbing; }
+.grat { fill: none; stroke: var(--grat); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.coastglow { fill: none; stroke: var(--coast-glow); stroke-width: 10; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.land { fill: var(--land); stroke: none; }
+.st { fill: none; stroke: var(--state); stroke-width: .9; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.rail { fill: none; stroke: var(--rail); stroke-width: .8; opacity: var(--rail-o); vector-effect: non-scaling-stroke; }
+.coast { fill: none; stroke: var(--coast); stroke-width: 1.3; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.slbl { fill: var(--state-lbl); font-family: var(--f-body); font-weight: 600; letter-spacing: .14em; text-anchor: middle; pointer-events: none; }
+.cdot { fill: var(--city); stroke: var(--land); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.rglow { fill: none; stroke-width: 13; opacity: .2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.rcase { fill: none; stroke: var(--route-casing); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.rline { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.l0 { stroke: var(--leg-a); } .l1 { stroke: var(--leg-b); } .l2 { stroke: var(--leg-c); } .l3 { stroke: var(--leg-d); }
+.f0 { fill: var(--leg-a); } .f1 { fill: var(--leg-b); } .f2 { fill: var(--leg-c); } .f3 { fill: var(--leg-d); }
+.arrow { stroke: var(--route-casing); stroke-width: 1.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
+.dot { stroke: var(--route-casing); stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: pointer; }
+.mk { stroke-width: 2.5; vector-effect: non-scaling-stroke; cursor: pointer; }
+.mk-o { fill: var(--ink); stroke: var(--route-casing); }
+.mk-d { fill: var(--accent); stroke: var(--route-casing); }
+.mk-x { fill: var(--route-casing); stroke: var(--ink); }
+.mkt { font-family: var(--f-data); font-weight: 600; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.mk-o + .mkt { fill: var(--bg); } .mk-d + .mkt { fill: var(--accent-ink); } .mk-x + .mkt { fill: var(--ink); }
+.chipbg { fill: var(--chip-bg); stroke: var(--chip-line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.chipt { fill: var(--ink); font-family: var(--f-body); font-weight: 600; pointer-events: none; }
+.lbl { fill: var(--ink); stroke: var(--land); paint-order: stroke; stroke-linejoin: round; font-family: var(--f-body); font-weight: 500; pointer-events: none; }
+.lbl.ctx { fill: var(--city); font-weight: 500; }
+.mapctl { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 6px; }
+.mapctl button { min-width: 36px; height: 36px; border: 1px solid var(--glass-line); color: var(--ink); border-radius: 10px; cursor: pointer; font-weight: 600; padding: 0 8px; box-shadow: var(--shadow); }
+.mapctl button:hover { color: var(--accent); }
+.mapscale { position: absolute; left: 10px; top: 10px; border: 1px solid var(--glass-line); border-radius: 10px; padding: 5px 9px 7px; font-family: var(--f-data); font-size: 11.5px; display: flex; flex-direction: column; gap: 3px; box-shadow: var(--shadow); }
+.mapscale i { display: block; height: 6px; border: 1.5px solid var(--ink); border-top: 0; width: 60px; }
+.mapcap { position: absolute; left: 10px; right: 56px; bottom: 10px; border: 1px solid var(--glass-line); border-radius: 12px; padding: 7px 11px; font-size: 12.5px; pointer-events: none; overflow-wrap: anywhere; box-shadow: var(--shadow); }
+
+@media (min-width: 900px) {
+  .trip.sel .trip-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+  .trip.sel .mapbox { height: auto; min-height: 480px; border-top: 0; border-left: 1px solid var(--line); }
+}
+@media (max-width: 760px) {
+  .search { grid-template-columns: minmax(0,1fr) auto; }
+  .search .from { grid-column: 1 / 2; }
+  .search .swap { grid-column: 2 / 3; grid-row: 1 / 2; align-self: end; }
+  .search .to { grid-column: 1 / -1; }
+  .search .datef { grid-column: 1 / 2; }
+  .search .go { grid-column: 2 / 3; }
+  .board .route, .top h1 { font-size: 29px; }
+  .run { grid-template-columns: minmax(0,1fr) auto; }
+  .run .track { grid-column: 1 / -1; grid-row: 2; flex-direction: row; justify-content: center; gap: 12px; }
+  .run .track::before { display: none; }
+  .run .stop.end { grid-column: 2; grid-row: 1; }
+  .fare { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<div class="bg" aria-hidden="true"></div>
+<main class="wrap">
+  <header class="top">
+    <h1>Interchange Finder</h1>
+    <p>Pick two stations and a date. When no train runs the whole way, this lists the stations where you change trains, with every connection timed from the Railway Board's 2026 timetable.</p>
+  </header>
+
+  <form class="search" id="form" autocomplete="off">
+    <div class="field from">
+      <label for="from">From</label>
+      <input id="from" type="text" role="combobox" aria-expanded="false" aria-controls="from-list" aria-autocomplete="list" placeholder="City or station" spellcheck="false">
+      <ul class="sugg" id="from-list" role="listbox" hidden></ul>
+    </div>
+    <button type="button" class="swap" id="swap" aria-label="Swap from and to">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
+    </button>
+    <div class="field to">
+      <label for="to">To</label>
+      <input id="to" type="text" role="combobox" aria-expanded="false" aria-controls="to-list" aria-autocomplete="list" placeholder="City or station" spellcheck="false">
+      <ul class="sugg" id="to-list" role="listbox" hidden></ul>
+    </div>
+    <div class="field datef">
+      <label for="date">Travel date</label>
+      <input id="date" type="date">
+    </div>
+    <button type="submit" class="go" id="go">Find routes</button>
+
+    <details class="opts" id="opts">
+      <summary>Options</summary>
+      <div class="optgrid">
+        <div class="opt"><label for="o-changes">Most changes</label>
+          <select id="o-changes"><option value="1">1 change</option><option value="2" selected>2 changes</option><option value="3">3 changes (slower)</option></select></div>
+        <div class="opt"><label for="o-min">Shortest wait, same station</label>
+          <select id="o-min"><option value="30">30 min</option><option value="45">45 min</option><option value="60">1 hour</option><option value="90" selected>1.5 hours</option><option value="120">2 hours</option></select></div>
+        <div class="opt"><label for="o-city">Shortest wait, other station in city</label>
+          <select id="o-city"><option value="120">2 hours</option><option value="180" selected>3 hours</option><option value="240">4 hours</option></select></div>
+        <div class="opt"><label for="o-max">Longest wait</label>
+          <select id="o-max"><option value="4">4 hours</option><option value="8">8 hours</option><option value="12" selected>12 hours</option><option value="24">24 hours</option></select></div>
+        <div class="opt"><label for="o-win">First train leaves</label>
+          <select id="o-win"><option value="24" selected>On the travel date</option><option value="48">Within 48 hours</option></select></div>
+        <div class="opt"><label for="o-basis">Fare estimate for</label>
+          <select id="o-basis"><option value="cheapest" selected>Cheapest class on each train</option><option value="SL">Sleeper (SL)</option><option value="3A">AC 3 tier (3A)</option><option value="2A">AC 2 tier (2A)</option><option value="CC">Chair car (CC)</option></select></div>
+        <div class="rates" id="rates"></div>
+        <p class="hint">Fare rates are rupees per km before the fixed reservation charge. They are rough starting values, so edit them to match what you usually pay.</p>
+      </div>
+    </details>
+  </form>
+
+  <section id="out" aria-live="polite">
+    <div class="busy">Loading the 2026 timetable…</div>
+  </section>
+
+  <details class="about">
+    <summary>About this data</summary>
+    <p id="aboutdata"></p>
+    <p>Seat availability and live running status are not included in this version. The map joins station coordinates stop by stop, so lines are approximate and not the exact track; the faint grey lines are every train's printed stops. State boundaries come from the open india-maps-data set by udit-001 (district boundaries, merged into states and simplified), so they are indicative only. Times are the printed timetable times, so a train that has been retimed since will differ. Each leg is a separate ticket, so a missed connection is not covered; keep waits of 90 minutes or more where you can. Check IRCTC or NTES before you book. Stations that the timetable does not print cannot be searched; if your destination is missing, pick the nearest big station and add a bus or taxi leg.</p>
+  </details>
+</main>
+
+<script type="application/json" id="data">__DATA__</script>
+<script type="application/json" id="geo">__GEO__</script>
+<script>
+/*ENGINE*/
+</script>
+<script>
+(function () {
+  var E = createEngine(JSON.parse(document.getElementById('data').textContent));
+  var $ = function (id) { return document.getElementById(id); };
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); };
+  function tm(m) { var dn = Math.floor(m / 1440), mm = ((m % 1440) + 1440) % 1440, d = new Date(dn * 86400000);
+    return { t: pad(Math.floor(mm / 60)) + ':' + pad(mm % 60), d: DOW[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MON[d.getUTCMonth()] }; }
+  function dur(m) { var h = Math.floor(m / 60), mi = m % 60; return h ? h + 'h ' + pad(mi) + 'm' : mi + 'm'; }
+  function inr(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+  var state = { from: null, to: null, res: null, tab: 'fastest', via: null, shown: 12, args: null, selKey: null, selIdx: 0, list: null };
+  var KEY = 'interchange-finder-v1';
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify({ from: state.from && state.from.label, to: state.to && state.to.label, opts: readOpts(true) })); } catch (e) {} }
+  function resolveLabel(label) {
+    if (!label) return null;
+    for (var i = 0; i < E.clusters.length; i++) if (E.clusters[i].name === label) return { kind: 'cluster', label: label, ids: E.clusters[i].ids };
+    var m = /\(([A-Z0-9]+)\)$/.exec(label);
+    if (m && E.byCode[m[1]] !== undefined) return { kind: 'station', label: label, ids: [E.byCode[m[1]]] };
+    return null;
+  }
+
+  /* rate inputs */
+  var RATE_KEYS = ['2S','SL','3A','2A','CC','1A','EC'];
+  $('rates').innerHTML = RATE_KEYS.map(function (k) { return '<div class="opt"><label for="r-' + k + '">' + k + ' ₹/km</label><input id="r-' + k + '" type="number" min="0" step="0.05" value="' + E.DEFAULT_RATES[k] + '"></div>'; }).join('');
+  function readOpts(forSave) {
+    var rates = {}; RATE_KEYS.forEach(function (k) { var v = parseFloat($('r-' + k).value); if (!isNaN(v)) rates[k] = v; });
+    return { maxChanges: +$('o-changes').value, minLayover: +$('o-min').value, minLayoverCity: +$('o-city').value, maxLayoverH: +$('o-max').value, windowH: +$('o-win').value, basis: $('o-basis').value, rates: rates };
+  }
+  function applyOpts(o) {
+    if (!o) return;
+    [['o-changes','maxChanges'],['o-min','minLayover'],['o-city','minLayoverCity'],['o-max','maxLayoverH'],['o-win','windowH'],['o-basis','basis']].forEach(function (p) { if (o[p[1]] !== undefined) $(p[0]).value = String(o[p[1]]); });
+    if (o.rates) RATE_KEYS.forEach(function (k) { if (o.rates[k] !== undefined) $('r-' + k).value = o.rates[k]; });
+  }
+
+  /* station pickers */
+  function combo(key) {
+    var input = $(key), list = $(key + '-list'), items = [], active = -1;
+    function close() { list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; }
+    function paint() {
+      list.innerHTML = items.map(function (it, i) { return '<li role="option" id="' + key + '-o' + i + '" data-i="' + i + '" aria-selected="' + (i === active) + '">' + esc(it.label) + (it.kind === 'cluster' ? '<small>city group</small>' : '') + '</li>'; }).join('');
+      list.hidden = !items.length; input.setAttribute('aria-expanded', String(!!items.length));
+    }
+    function pick(i) { var it = items[i]; if (!it) return; state[key] = it; input.value = it.label; close(); }
+    input.addEventListener('input', function () { state[key] = null; items = E.stationSearch(input.value, 8); active = items.length ? 0 : -1; paint(); });
+    input.addEventListener('focus', function () { input.select(); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (items.length) { active = (active + 1) % items.length; paint(); } }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (items.length) { active = (active - 1 + items.length) % items.length; paint(); } }
+      else if (e.key === 'Enter' && !list.hidden && active >= 0) { e.preventDefault(); pick(active); }
+      else if (e.key === 'Escape') close();
+    });
+    list.addEventListener('mousedown', function (e) { var li = e.target.closest('li'); if (li) { e.preventDefault(); pick(+li.dataset.i); } });
+    input.addEventListener('blur', function () { setTimeout(close, 120); });
+    return { set: function (it) { state[key] = it; input.value = it ? it.label : ''; }, commit: function () { if (!state[key] && input.value.trim()) { var r = E.stationSearch(input.value, 1)[0]; if (r) { state[key] = r; input.value = r.label; } } } };
+  }
+  var cFrom = combo('from'), cTo = combo('to');
+  $('swap').addEventListener('click', function () { var a = state.from, b = state.to; cFrom.set(b); cTo.set(a); if (a && b) run(); });
+
+  /* search */
+  function run() {
+    cFrom.commit(); cTo.commit();
+    var out = $('out');
+    if (!state.from || !state.to) { out.innerHTML = '<div class="panel"><h2>Choose both stations</h2><p>Start typing a city or station name, then pick it from the list.</p></div>'; return; }
+    if (!$('date').value) { out.innerHTML = '<div class="panel"><h2>Choose a date</h2><p>Trains run on different days, so the date decides which connections exist.</p></div>'; return; }
+    var o = readOpts();
+    var args = { origins: state.from.ids, dests: state.to.ids, date: $('date').value, maxChanges: o.maxChanges, minLayover: o.minLayover, minLayoverCity: o.minLayoverCity, maxLayoverH: o.maxLayoverH, windowH: o.windowH, basis: o.basis, rates: o.rates };
+    save();
+    out.innerHTML = '<div class="busy">Searching ' + esc(state.from.label) + ' → ' + esc(state.to.label) + (o.maxChanges > 2 ? ' (3 changes can take several seconds)' : '') + '…</div>';
+    setTimeout(function () {
+      var t0 = performance.now();
+      state.res = E.search(args); state.args = args; state.ms = Math.round(performance.now() - t0);
+      state.tab = 'fastest'; state.via = null; state.shown = 12; state.selKey = null; render();
+    }, 40);
+  }
+  $('form').addEventListener('submit', function (e) { e.preventDefault(); run(); });
+  $('date').addEventListener('change', function () { if (state.from && state.to) run(); });
+  $('opts').addEventListener('change', function () { if (state.from && state.to) run(); });
+
+  /* rendering */
+  function tripHTML(it, n) {
+    var a = state.args;
+    var t0 = tm(it.dep), t1 = tm(it.arr);
+    var via = it.legs.slice(1).map(function (l) { return l.from.name; });
+    var sel = (n === state.selIdx);
+    var h = '<article class="trip' + (sel ? ' sel' : '') + '" data-n="' + n + '"><div class="trip-h"><span class="dur">' + dur(it.dur) + '</span><span class="chg">' + (it.changes === 0 ? 'Direct train' : it.changes + (it.changes === 1 ? ' change' : ' changes')) + '</span>' +
+      '<span class="fare">' + (it.fare != null ? '<small>about</small>' + inr(it.fare) : '<small>fare</small>not available') + '</span>' +
+      '<button type="button" class="viewmap" data-sel="' + n + '" aria-pressed="' + sel + '">' + (sel ? 'On map' : 'Show on map') + '</button><button type="button" class="copy" data-n="' + n + '">Copy</button></div>' +
+      '<div class="trip-body"><div class="trip-main"><p class="trip-sub">' + t0.d + ' ' + t0.t + ' → ' + t1.d + ' ' + t1.t + (via.length ? ' · change at ' + esc(via.join(', ')) : '') + '</p><ol class="legs">';
+    var warn = {};
+    it.legs.forEach(function (l, k) {
+      if (k > 0) {
+        var p = it.legs[k - 1], w = l.dep - p.arr, other = p.to.i !== l.from.i;
+        var cls = 'gap' + (w < 90 ? ' tight' : (w > 480 ? ' long' : ''));
+        h += '<li class="' + cls + '"><span><b>' + (other ? 'Change stations in the city' : 'Change at ' + esc(l.from.name)) + '</b> · wait ' + dur(w) + (w < 90 ? ' <em>tight, a late train breaks this</em>' : '') + '</span>' +
+          (other ? '<span>' + esc(p.to.name) + ' → ' + esc(l.from.name) + ' by road</span>' : '') + '</li>';
+      }
+      var d0 = tm(l.dep), d1 = tm(l.arr);
+      if (!l.daysKnown) warn.days = 1; if (!l.originKnown) warn.appr = 1;
+      h += '<li class="leg" style="--lc:var(--leg-' + 'abcd'.charAt(k % 4) + ')"><div class="train"><span class="tno">' + esc(l.n) + '</span><span class="tname">' + esc(l.name) + '</span>' + (l.type ? '<span class="ttype">' + esc(l.type) + '</span>' : '') + '</div>' +
+        '<div class="run"><div class="stop"><span class="tm">' + d0.t + '</span><span class="dt">' + d0.d + '</span><span class="sn">' + esc(l.from.name) + '<i>' + esc(l.from.code) + '</i></span></div>' +
+        '<div class="track"><span>' + dur(l.arr - l.dep) + '</span><span>' + (l.km != null ? '~' + l.km + ' km' : '') + '</span></div>' +
+        '<div class="stop end"><span class="tm">' + d1.t + '</span><span class="dt">' + d1.d + '</span><span class="sn">' + esc(l.to.name) + '<i>' + esc(l.to.code) + '</i></span></div></div>' +
+        '<div class="cls">' + (l.classes.length ? l.classes.map(function (c) { return '<span class="' + (c === l.cls ? 'pick' : '') + '">' + c + '</span>'; }).join('') : '<span>classes not listed</span>') +
+        (l.fare != null ? ' <span>' + l.cls + ' about ' + inr(l.fare) + '</span>' : '') + '</div>' + viaHTML(l) + '</li>';
+    });
+    h += '</ol>';
+    var notes = [];
+    if (warn.days) notes.push('Running days for one train are not in the timetable, so it is assumed to run on this date.');
+    if (warn.appr) notes.push('One train\'s starting station is not confirmed, so its date may be off by a day.');
+    if (notes.length) h += '<p class="notes">' + notes.join(' ') + '</p>';
+    h += '</div>' + (sel ? MAPBOX : '') + '</div></article>';
+    return h;
+  }
+
+  var MAPBOX = '<div class="mapbox"><svg class="mapsvg" id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of the selected route"><g id="base"></g><g id="rl"></g></svg>' +
+    '<div class="mapscale"><span id="mapscale-t">200 km</span><i id="mapscale-b"></i></div>' +
+    '<div class="mapctl"><button type="button" data-act="in" aria-label="Zoom in">+</button><button type="button" data-act="out" aria-label="Zoom out">&minus;</button><button type="button" data-act="fit" aria-label="Fit the route">Fit</button></div>' +
+    '<div class="mapcap" id="mapcap">A start, B end, numbers are changes. Drag to pan, Ctrl + scroll to zoom.</div></div>';
+
+  function viaHTML(l) {
+    var tr = l.train, mid = [], k;
+    for (k = l.p + 1; k < l.q; k++) mid.push(k);
+    if (!mid.length) return '';
+    var top = mid.slice().sort(function (a, b) { return E.byStation[tr.stops[b][0]].length - E.byStation[tr.stops[a][0]].length; }).slice(0, 3).sort(function (a, b) { return a - b; })
+      .map(function (q) { return E.ST[tr.stops[q][0]].name; });
+    var prevDay = Math.floor(l.dep / 1440);
+    var items = mid.map(function (q) {
+      var s = tr.stops[q], st = E.ST[s[0]], a = l.O * 1440 + s[1], dp = l.O * 1440 + s[2], ta = tm(a), halt = dp - a;
+      var dayTag = Math.floor(a / 1440) !== prevDay ? '<small>' + ta.d + '</small>' : ''; prevDay = Math.floor(a / 1440);
+      return '<li><span class="vn">' + esc(st.name) + '<i>' + esc(st.code) + '</i></span><span class="vt">' + ta.t + (halt > 0 ? ' · halts ' + halt + 'm' : '') + dayTag + '</span></li>';
+    }).join('');
+    return '<details class="via"><summary>' + mid.length + ' intermediate ' + (mid.length === 1 ? 'stop' : 'stops') + '<span>' + esc(top.join(', ')) + '</span></summary><ol>' + items + '</ol></details>';
+  }
+  function keyOf(it) { return it.legs.map(function (l) { return l.n + '@' + l.dep; }).join('|'); }
+  function selectTrip(n) { var it = state.list && state.list[n]; if (!it || n === state.selIdx) return; state.selKey = keyOf(it); render(); }
+
+  function visibleItineraries() {
+    var its = state.res.its;
+    if (state.via !== null) its = its.filter(function (it) { return it.legs.slice(1).some(function (l) { return l.from.i === state.via; }); });
+    return its;
+  }
+
+  function render() {
+    var out = $('out'), r = state.res, a = state.args, sy = window.pageYOffset || 0;
+    var t = tm(r.t0 === undefined ? 0 : a ? E.dayNum(a.date) * 1440 : 0);
+    var head = '<div class="board"><div class="route">' + esc(state.from.label.replace(/ \([A-Z0-9]+\)$/, '')) + '<i>→</i>' + esc(state.to.label.replace(/ \([A-Z0-9]+\)$/, '')) + '</div><div class="meta">' + t.d + ' ' + a.date.slice(0, 4) + ' · ' + r.count.toLocaleString('en-IN') + ' options · ' + state.ms + ' ms</div></div>';
+    if (!r.count) { out.innerHTML = head + noRoute(); wireOut(); return; }
+    var by = {}; r.its.forEach(function (i) { by[i.changes] = (by[i.changes] || 0) + 1; });
+    var counts = '<div class="counts">' + [0,1,2,3].filter(function (c) { return by[c]; }).map(function (c) { return '<span><b>' + by[c].toLocaleString('en-IN') + '</b> ' + (c === 0 ? 'direct' : 'with ' + c + (c === 1 ? ' change' : ' changes')) + '</span>'; }).join('') + (r.capped ? '<span>Search stopped early, so some options are missing.</span>' : '') + '</div>';
+    var tabs = '<div class="tabs" role="tablist">' + [['fastest','Fastest'],['cheapest','Cheapest'],['fewest','Fewest changes'],['hubs','Interchange stations']].map(function (x) { return '<button class="tab" role="tab" data-tab="' + x[0] + '" aria-selected="' + (state.tab === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>';
+    var body = '';
+    var chip = state.via !== null ? '<div class="chips"><button class="chip" data-clear="1">Via ' + esc(E.ST[state.via].name) + ' &times;</button></div>' : '';
+    if (state.tab === 'hubs') {
+      var hs = E.hubs(r.its);
+      body = '<p class="counts">Stations where you could change trains, ranked by how many one-change routes use them.</p><div class="hubs">' + hs.map(function (h) {
+        return '<div class="hub"><h3>' + esc(h.st.name) + '<i>' + esc(h.st.code) + '</i></h3><dl><dt>One-change routes</dt><dd>' + h.single + '</dd><dt>All routes using it</dt><dd>' + h.count.toLocaleString('en-IN') + '</dd><dt>Best total time</dt><dd>' + dur(h.best) + '</dd><dt>Lowest fare</dt><dd>' + (isFinite(h.bestFare) ? inr(h.bestFare) : 'n/a') + '</dd></dl><button type="button" data-via="' + h.st.i + '">Show routes via here</button></div>';
+      }).join('') + '</div>';
+    } else {
+      var all = visibleItineraries();
+      var list = E.rank(all, state.tab, state.shown);
+      state.list = list;
+      var si = -1; list.forEach(function (x, ix) { if (si < 0 && keyOf(x) === state.selKey) si = ix; });
+      if (si < 0) si = 0;
+      state.selIdx = si; state.selKey = list.length ? keyOf(list[si]) : null;
+      var distinct = E.rank(all, state.tab, 100000).length;
+      body = chip + '<div class="list">' + list.map(function (it, n) { return tripHTML(it, n); }).join('') + '</div>' +
+        (distinct > list.length ? '<button type="button" class="more" id="more">Show more (' + (distinct - list.length) + ' other ways to change)</button>' : '');
+      if (!list.length) body = chip + '<div class="panel"><p>No routes use that station with the current options.</p></div>';
+    }
+    out.innerHTML = head + counts + tabs + body;
+    wireOut();
+    initMap();
+    if (sy > 0) { try { window.scrollTo(0, sy); } catch (e) {} }
+  }
+
+  function noRoute() {
+    var a = state.args, d = E.nearestStations(state.to.ids[0], 5), o = E.nearestStations(state.from.ids[0], 4);
+    var h = '<div class="panel"><h2>No rail route found</h2><p>No combination of up to ' + a.maxChanges + (a.maxChanges === 1 ? ' change' : ' changes') + ' connects these stations on this date with a ' + dur(a.minLayover) + ' minimum wait and ' + a.maxLayoverH + ' hour maximum wait.</p><ul>';
+    if (a.maxChanges < 3) h += '<li>Allow more changes, or try another date; many trains run only on some weekdays.</li>';
+    h += '<li>Loosen the wait limits in Options.</li>';
+    if (d.length) h += '<li>Rail to a nearby station, then finish by road. Closest stations to ' + esc(state.to.label.replace(/ \([A-Z0-9]+\)$/, '')) + ': ' + d.map(function (x) { return esc(x.st.name) + ' (' + x.km + ' km straight line)'; }).join(', ') + '.</li>';
+    if (o.length) h += '<li>Or start from a closer railhead: ' + o.map(function (x) { return esc(x.st.name) + ' (' + x.km + ' km)'; }).join(', ') + '.</li>';
+    h += '<li>For a bus leg, check <a href="https://www.redbus.in" target="_blank" rel="noopener">RedBus</a> or <a href="https://www.abhibus.com" target="_blank" rel="noopener">AbhiBus</a>. This page does not read bus timetables.</li></ul>';
+    if (a.maxChanges < 3) h += '<button type="button" class="btn" id="try3">Try up to 3 changes</button>';
+    return h + '</div>';
+  }
+
+  function tripText(it) {
+    var t0 = tm(it.dep), t1 = tm(it.arr), L = [];
+    L.push(state.from.label.replace(/ \([A-Z0-9]+\)$/, '') + ' to ' + state.to.label.replace(/ \([A-Z0-9]+\)$/, '') + ' · ' + dur(it.dur) + ' · ' + (it.changes ? it.changes + ' change(s)' : 'direct') + (it.fare != null ? ' · about ' + inr(it.fare) : ''));
+    it.legs.forEach(function (l, k) {
+      if (k > 0) L.push('   wait ' + dur(l.dep - it.legs[k - 1].arr) + ' at ' + l.from.name);
+      var a = tm(l.dep), b = tm(l.arr);
+      L.push(l.n + ' ' + l.name + ': ' + l.from.name + ' (' + l.from.code + ') ' + a.d + ' ' + a.t + ' → ' + l.to.name + ' (' + l.to.code + ') ' + b.d + ' ' + b.t + (l.cls ? ' · ' + l.cls : ''));
+    });
+    return L.join('\n');
+  }
+  function copyText(s, btn) {
+    function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(function () { btn.textContent = o; }, 1400); }
+    function fallback() { var ta = document.createElement('textarea'); ta.value = s; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(ok); }
+    try { navigator.clipboard.writeText(s).then(function () { done(true); }, fallback); } catch (e) { fallback(); }
+  }
+
+  function wireOut() {
+    var out = $('out');
+    out.onclick = function (e) {
+      var t = e.target.closest('button');
+      if (!t) { var card = e.target.closest('.trip'); if (card && !e.target.closest('details, a, .mapbox')) selectTrip(+card.dataset.n); return; }
+      if (t.dataset.sel !== undefined) { selectTrip(+t.dataset.sel); return; }
+      if (t.dataset.tab) { state.tab = t.dataset.tab; state.shown = 12; render(); }
+      else if (t.dataset.via) { state.via = +t.dataset.via; state.tab = 'fastest'; state.shown = 12; render(); }
+      else if (t.dataset.clear) { state.via = null; render(); }
+      else if (t.id === 'more') { state.shown += 12; render(); }
+      else if (t.id === 'try3') { $('o-changes').value = '3'; run(); }
+      else if (t.classList.contains('copy')) { copyText(tripText(state.list[+t.dataset.n]), t); }
+    };
+  }
+
+
+  /* ---------- route map (SVG, drawn from embedded geometry, no tiles) ---------- */
+  var GEO = JSON.parse(document.getElementById('geo').textContent);
+  /* Lambert conformal conic centred on India. Units are kilometres, so 1 SVG unit is 1 km. */
+  var LCC = (function () {
+    var D = Math.PI / 180, R = 6371, p1 = 12.5 * D, p2 = 28.5 * D, p0 = 22 * D, l0 = 80 * D;
+    var n = Math.log(Math.cos(p1) / Math.cos(p2)) / Math.log(Math.tan(Math.PI / 4 + p2 / 2) / Math.tan(Math.PI / 4 + p1 / 2));
+    var F = Math.cos(p1) * Math.pow(Math.tan(Math.PI / 4 + p1 / 2), n) / n, r0 = F / Math.pow(Math.tan(Math.PI / 4 + p0 / 2), n);
+    return function (lat, lon) { var r = F / Math.pow(Math.tan(Math.PI / 4 + lat * D / 2), n), th = n * (lon * D - l0); return [R * r * Math.sin(th), -R * (r0 - r * Math.cos(th))]; };
+  })();
+  var BASE = null, NETB = null, CTX = null, M = null;
+
+  function buildBase() {
+    if (BASE) return;
+    var seen = {}, net = [], x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, P = E.ST.map(function (s) { if (s.lat == null) return null; var q = LCC(s.lat, s.lon); return [Math.round(q[0]), Math.round(q[1])]; });
+    E.TR.forEach(function (tr) {
+      for (var k = 0; k < tr.stops.length - 1; k++) {
+        var a = tr.stops[k][0], b = tr.stops[k + 1][0]; if (a === b) continue;
+        var key = a < b ? a * 1024 + b : b * 1024 + a; if (seen[key]) continue; seen[key] = 1;
+        var A = P[a], B = P[b]; if (!A || !B || Math.abs(A[0] - B[0]) > 1000 || Math.abs(A[1] - B[1]) > 1000) continue;
+        net.push('M' + A[0] + ' ' + A[1] + 'L' + B[0] + ' ' + B[1]);
+        x0 = Math.min(x0, A[0], B[0]); x1 = Math.max(x1, A[0], B[0]); y0 = Math.min(y0, A[1], B[1]); y1 = Math.max(y1, A[1], B[1]);
+      }
+    });
+    NETB = { x0: x0, x1: x1, y0: y0, y1: y1, w: x1 - x0, h: y1 - y0 };
+    var gd = '', la, lo, q;
+    for (la = 5; la <= 40; la += 5) for (lo = 58; lo <= 108; lo += 1) { q = LCC(la, lo); gd += (lo === 58 ? 'M' : 'L') + Math.round(q[0]) + ' ' + Math.round(q[1]); }
+    for (lo = 65; lo <= 100; lo += 5) for (la = 2; la <= 42; la += 1) { q = LCC(la, lo); gd += (la === 2 ? 'M' : 'L') + Math.round(q[0]) + ' ' + Math.round(q[1]); }
+    BASE = '<path class="grat" d="' + gd + '"/><path class="coastglow" d="' + GEO.india + '"/><path class="land" d="' + GEO.india + '"/>' +
+      '<path class="st" d="' + GEO.states.map(function (s) { return s.d; }).join('') + '"/><path class="rail" d="' + net.join('') + '"/><path class="coast" d="' + GEO.india + '"/>';
+  }
+  function ctxCities() {
+    if (CTX) return CTX;
+    var ids = E.ST.filter(function (s) { return s.lat != null; }).map(function (s) { return s.i; }).sort(function (a, b) { return E.byStation[b].length - E.byStation[a].length; }), out = [];
+    for (var i = 0; i < ids.length && out.length < 55; i++) {
+      var s = E.ST[ids[i]], q = LCC(s.lat, s.lon);
+      if (out.some(function (o) { return Math.hypot(o.x - q[0], o.y - q[1]) < 55; })) continue;
+      out.push({ x: q[0], y: q[1], st: s });
+    }
+    return (CTX = out);
+  }
+  function legPoints(it) {
+    return it.legs.map(function (l) {
+      var tr = l.train, arr = [];
+      for (var k = l.p; k <= l.q; k++) {
+        var s = tr.stops[k], st = E.ST[s[0]]; if (st.lat == null) continue;
+        var q = LCC(st.lat, st.lon);
+        arr.push({ x: +q[0].toFixed(1), y: +q[1].toFixed(1), st: st, end: (k === l.p || k === l.q), first: k === l.p, last: k === l.q, a: l.O * 1440 + s[1], d: l.O * 1440 + s[2], n: l.n });
+      }
+      return arr;
+    });
+  }
+  function tipOf(p) {
+    var t = p.st.name + ' (' + p.st.code + ') · train ' + p.n + ' · ';
+    if (p.first) return t + 'departs ' + tm(p.d).d + ' ' + tm(p.d).t;
+    if (p.last) return t + 'arrives ' + tm(p.a).d + ' ' + tm(p.a).t;
+    return t + 'arrives ' + tm(p.a).t + (p.d > p.a ? ', halts ' + (p.d - p.a) + ' min' : '');
+  }
+  function mapView() { var v = M.vb; M.svg.setAttribute('viewBox', v.x.toFixed(1) + ' ' + v.y.toFixed(1) + ' ' + v.w.toFixed(1) + ' ' + v.h.toFixed(1)); }
+  function mapBox(x0, x1, y0, y1) {
+    var bw = Math.max(x1 - x0, 190), bh = Math.max(y1 - y0, 190), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, w = bw * 1.3, h = bh * 1.3;
+    var bottom = M.H > 220 ? 58 : 0, asp = M.W / (M.H - bottom); /* keep the route clear of the caption box */
+    if (w / h < asp) w = h * asp; else h = w / asp;
+    M.vb = { x: cx - w / 2, y: cy - h / 2, w: w, h: h * M.H / (M.H - bottom) };
+  }
+  function mapFit() {
+    var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    M.legs.forEach(function (L) { L.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }); });
+    if (x0 > x1) { x0 = NETB.x0; x1 = NETB.x1; y0 = NETB.y0; y1 = NETB.y1; }
+    mapBox(x0, x1, y0, y1); mapView(); mapDraw();
+  }
+  function mapZoom(f, fx, fy) {
+    var v = M.vb, nw = Math.min(Math.max(v.w * f, 90), NETB.w * 1.6); f = nw / v.w;
+    var nh = v.h * f; v.x += (v.w - nw) * fx; v.y += (v.h - nh) * fy; v.w = nw; v.h = nh; mapView(); mapDraw();
+  }
+  function mapDraw() {
+    var v = M.vb, s = v.w / M.W, W = M.W, H = M.H, legs = M.legs, placed = [], done = {};
+    function fmt(n) { return n.toFixed(2); }
+    var samples = [];
+    legs.forEach(function (L) { for (var k = 1; k < L.length; k++) { var ax = (L[k - 1].x - v.x) / s, ay = (L[k - 1].y - v.y) / s, bx = (L[k].x - v.x) / s, by = (L[k].y - v.y) / s, n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / 6)); for (var j = 0; j <= n; j++) samples.push([ax + (bx - ax) * j / n, ay + (by - ay) * j / n]); } });
+    function nearRoute(r) { for (var j = 0; j < samples.length; j++) { var q = samples[j]; if (q[0] > r.x - 5 && q[0] < r.x + r.w + 5 && q[1] > r.y - 5 && q[1] < r.y + r.h + 5) return true; } return false; }
+    /* label placement in screen pixels; chips are forced, text labels skip when they would collide */
+    function label(p, mode) {
+      if (done[p.st.i]) return '';
+      var sx = (p.x - v.x) / s, sy = (p.y - v.y) / s; if (sx < 8 || sx > W - 8 || sy < 8 || sy > H - 8) return '';
+      var chip = mode === 'chip', ctx = mode === 'ctx', fs = ctx ? 10.5 : 12, cw = ctx ? 5.5 : 6.2, nm = p.st.name,
+        w = nm.length * cw + (chip ? 20 : 6), h = chip ? 22 : 15, off = chip ? 15 : (ctx ? 7 : 10),
+        right = sx + off + w < W - 6, x = right ? sx + off : sx - off - w, r = { x: x, y: sy - h / 2, w: w, h: h };
+      if (!chip) for (var i = 0; i < placed.length; i++) { var q = placed[i]; if (r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y) return ''; }
+      if (ctx && (nm.length > 18 || nearRoute(r) || nearRoute({ x: sx - 6, y: sy - 6, w: 12, h: 12 }))) return '';
+      placed.push(r); done[p.st.i] = 1;
+      var X = v.x + x * s;
+      if (chip) return '<rect class="chipbg" x="' + fmt(X) + '" y="' + fmt(v.y + (sy - 11) * s) + '" width="' + fmt(w * s) + '" height="' + fmt(22 * s) + '" rx="' + fmt(11 * s) + '"/><text class="chipt" x="' + fmt(X + 10 * s) + '" y="' + fmt(p.y + 4.2 * s) + '" font-size="' + fmt(12 * s) + '">' + esc(nm) + '</text>';
+      return '<text class="lbl' + (ctx ? ' ctx' : '') + '" x="' + fmt(p.x + (right ? off : -off) * s) + '" y="' + fmt(p.y + 3.8 * s) + '" text-anchor="' + (right ? 'start' : 'end') + '" font-size="' + fmt(fs * s) + '" style="stroke-width:' + fmt(3 * s) + 'px">' + esc(nm) + '</text>';
+    }
+    var g = '', i;
+    /* state names, only where they fit inside the state */
+    GEO.states.forEach(function (st) {
+      var wpx = st.b[0] / s, tw = st.n.length * 7.6; if (tw > wpx * 0.92) return;
+      var sx = (st.c[0] - v.x) / s, sy = (st.c[1] - v.y) / s; if (sx - tw / 2 < 4 || sx + tw / 2 > W - 4 || sy < 10 || sy > H - 10) return;
+      g += '<text class="slbl" x="' + st.c[0] + '" y="' + st.c[1] + '" font-size="' + fmt(10.5 * s) + '">' + esc(st.n.toUpperCase()) + '</text>';
+    });
+    /* route geometry first, so labels know what is on screen */
+    var marks = [];
+    legs.forEach(function (L, li) {
+      if (!L.length) return;
+      marks.push({ p: L[0], kind: li === 0 ? 'o' : 'x', txt: li === 0 ? 'A' : String(li) });
+      marks.push({ p: L[L.length - 1], kind: li === legs.length - 1 ? 'd' : 'x', txt: li === legs.length - 1 ? 'B' : String(li + 1) });
+    });
+    var chips = '', txts = '', ctxs = '', ctxDots = '';
+    marks.forEach(function (m) { chips += label(m.p, 'chip'); });
+    var mids = []; legs.forEach(function (L) { L.forEach(function (p) { if (!p.end) mids.push(p); }); });
+    mids.sort(function (a, b) { return E.byStation[b.st.i].length - E.byStation[a.st.i].length; });
+    for (i = 0; i < mids.length && i < 80; i++) txts += label(mids[i], 'txt');
+    ctxCities().forEach(function (c) {
+      var t = label({ x: c.x, y: c.y, st: c.st }, 'ctx');
+      if (t) { ctxs += t; ctxDots += '<circle class="cdot" cx="' + fmt(c.x) + '" cy="' + fmt(c.y) + '" r="' + fmt(2.6 * s) + '"/>'; }
+    });
+    g += ctxDots + ctxs;
+    legs.forEach(function (L, li) {
+      if (L.length < 2) return;
+      var pts = L.map(function (p) { return p.x + ',' + p.y; }).join(' ');
+      g += '<polyline class="rglow l' + (li % 4) + '" points="' + pts + '"/><polyline class="rcase" points="' + pts + '"/><polyline class="rline l' + (li % 4) + '" points="' + pts + '"/>';
+    });
+    /* direction chevrons every ~130 px along each leg */
+    legs.forEach(function (L, li) {
+      var sp = 130 * s, carry = sp * 0.55, n = 0;
+      for (var k = 1; k < L.length && n < 60; k++) {
+        var a = L[k - 1], b = L[k], dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy); if (!len) continue;
+        var ang = Math.atan2(dy, dx) * 180 / Math.PI, d = carry;
+        while (d < len && n < 60) { var t = d / len, x = a.x + dx * t, y = a.y + dy * t, px = (x - v.x) / s, py = (y - v.y) / s;
+          if (px > 0 && px < W && py > 0 && py < H) { g += '<path class="arrow f' + (li % 4) + '" transform="translate(' + fmt(x) + ' ' + fmt(y) + ') rotate(' + fmt(ang) + ') scale(' + fmt(s) + ')" d="M6 0L-4.2 4.4L-4.2 -4.4Z"/>'; n++; }
+          d += sp; }
+        carry = d - len;
+      }
+    });
+    legs.forEach(function (L, li) {
+      L.forEach(function (p) { if (!p.end) g += '<circle class="dot f' + (li % 4) + '" cx="' + p.x + '" cy="' + p.y + '" r="' + fmt(3.8 * s) + '" data-tip="' + esc(tipOf(p)) + '"/>'; });
+    });
+    g += txts;
+    marks.forEach(function (m) {
+      g += '<g data-tip="' + esc(tipOf(m.p)) + '"><circle class="mk mk-' + m.kind + '" cx="' + m.p.x + '" cy="' + m.p.y + '" r="' + fmt(9 * s) + '"/><text class="mkt" x="' + m.p.x + '" y="' + m.p.y + '" font-size="' + fmt(10.5 * s) + '">' + m.txt + '</text></g>';
+    });
+    g += chips;
+    M.layer.innerHTML = g;
+    /* scale bar */
+    var nice = [5, 10, 20, 50, 100, 200, 500, 1000], km = 5; nice.forEach(function (q) { if (q / s <= 110) km = q; });
+    M.sbar.style.width = Math.max(14, km / s) + 'px'; M.stxt.textContent = km + ' km';
+  }
+  function initMap() {
+    var svg = $('map'), it = svg && state.list && state.list[state.selIdx];
+    if (!it) { M = null; return; }
+    buildBase();
+    var box = svg.parentNode;
+    M = { svg: svg, box: box, cap: $('mapcap'), layer: svg.querySelector('#rl'), sbar: $('mapscale-b'), stxt: $('mapscale-t'), W: box.clientWidth || 640, H: box.clientHeight || 380, vb: null, drag: null, legs: legPoints(it) };
+    svg.querySelector('#base').innerHTML = BASE;
+    mapFit();
+    var me = M, setCap = function (t) { me.cap.textContent = t; };
+    svg.addEventListener('mouseover', function (e) { var t = e.target.closest && e.target.closest('[data-tip]'); if (t) setCap(t.getAttribute('data-tip')); });
+    svg.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-tip]'); if (t) setCap(t.getAttribute('data-tip')); });
+    svg.addEventListener('pointerdown', function (e) { if (e.button > 0) return; me.drag = { x: e.clientX, y: e.clientY, vx: me.vb.x, vy: me.vb.y, moved: false, id: e.pointerId }; });
+    svg.addEventListener('pointermove', function (e) {
+      var d = me.drag; if (!d) return; var dx = e.clientX - d.x, dy = e.clientY - d.y;
+      if (!d.moved && Math.abs(dx) + Math.abs(dy) > 4) { d.moved = true; try { svg.setPointerCapture(d.id); } catch (x) {} }
+      if (!d.moved) return; var k = me.vb.w / me.W; me.vb.x = d.vx - dx * k; me.vb.y = d.vy - dy * k; mapView();
+    });
+    var endDrag = function () { var d = me.drag; me.drag = null; if (d && d.moved) mapDraw(); };
+    svg.addEventListener('pointerup', endDrag); svg.addEventListener('pointercancel', endDrag);
+    svg.addEventListener('wheel', function (e) {
+      if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault();
+      var r = svg.getBoundingClientRect(); mapZoom(e.deltaY < 0 ? 0.8 : 1.25, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+    }, { passive: false });
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-act]'); if (!b) return;
+      if (b.dataset.act === 'in') mapZoom(0.7, .5, .5); else if (b.dataset.act === 'out') mapZoom(1.43, .5, .5); else mapFit();
+    });
+    if (typeof ResizeObserver !== 'undefined') {
+      var ro = new ResizeObserver(function () {
+        if (M !== me || !box.isConnected) { ro.disconnect(); return; }
+        var w = box.clientWidth, h = box.clientHeight; if (!w || !h || (w === me.W && h === me.H)) return;
+        me.W = w; me.H = h; me.vb.h = me.vb.w * h / w; mapView(); mapDraw();
+      });
+      ro.observe(box);
+    }
+  }
+
+  /* start: restore last search, or open with a real example (Indore to Dehradun) */
+  var saved = load();
+  applyOpts(saved.opts);
+  var f = resolveLabel(saved.from) || resolveLabel('Indore (INDB)'), to = resolveLabel(saved.to) || resolveLabel('Dehradun (DDN)');
+  cFrom.set(f); cTo.set(to);
+  var d = new Date(); d.setDate(d.getDate() + 3);
+  $('date').value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  $('date').min = new Date().getFullYear() + '-' + pad(new Date().getMonth() + 1) + '-' + pad(new Date().getDate());
+  $('aboutdata').textContent = 'Timetable: Indian Railways Trains at a Glance 2026 (Railway Board), ' + E.TR.length.toLocaleString('en-IN') + ' trains across ' + E.ST.length + ' stations, parsed into the open railways-mcp dataset. Distances are not in the source, so fares are estimated from the length of each leg along the printed stops and the per-km rates in Options.';
+  setTimeout(run, 30);
+})();
+</script>
