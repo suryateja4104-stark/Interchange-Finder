@@ -5,17 +5,17 @@
 <style>
 /* Layout: one column of frosted glass panels floating over a soft sky, amber and mint light field. Search first, then a dark glass station board for the route, then trip cards. The selected trip opens a map beside its legs. */
 :root {
-  --bg: #E4EBF3; --bg-a: #8DBFEC; --bg-b: #F4CC8B; --bg-c: #9DDBC6;
+  --bg: #EEF4FC; --bg-a: #A9CDF7; --bg-b: #FFFFFF; --bg-c: #C4DBF9;
   --glass: rgba(255,255,255,.55); --glass-2: rgba(255,255,255,.36); --glass-hi: rgba(255,255,255,.84); --glass-solid: #F3F7FB;
   --glass-line: rgba(255,255,255,.88); --line: rgba(22,50,84,.15);
   --shadow: 0 10px 34px rgba(30,64,104,.14), inset 0 1px 0 rgba(255,255,255,.75);
   --sel-glow: 0 16px 44px rgba(11,92,173,.26);
   --ink: #0E1C2B; --muted: #465A6F;
   --accent: #0B5CAD; --accent-ink: #FFFFFF; --accent-soft: rgba(11,92,173,.13);
-  --board-a: rgba(9,21,36,.90); --board-b: rgba(20,45,72,.82); --board-ink: #F2F5F8; --board-amber: #FFB938;
+  --board-a: rgba(10,58,128,.94); --board-b: rgba(36,120,214,.88); --board-ink: #FFFFFF; --board-amber: #BFE0FF;
   --warn: #8F5200; --warn-soft: rgba(244,170,40,.24); --bad: #B3261E;
-  --leg-a: #0B5CAD; --leg-b: #C2410C; --leg-c: #17803F; --leg-d: #7A3FB0;
-  --sea-a: #CFE3F3; --sea-b: #B2D0E8; --land: #F6F3EA; --state: #C2CAD3; --coast: #6C8CA8; --coast-glow: rgba(255,255,255,.6);
+  --leg-a: #0B4FA8; --leg-b: #2F9BF0; --leg-c: #5560E8; --leg-d: #0E8FA6;
+  --sea-a: #D6E8FB; --sea-b: #BCD8F5; --land: #FAFCFF; --state: #C2CAD3; --coast: #6C8CA8; --coast-glow: rgba(255,255,255,.6);
   --grat: rgba(255,255,255,.7); --rail: #8E9DAE; --rail-o: .3; --state-lbl: #7D8E9F; --city: #5F7185; --route-casing: #FFFFFF;
   --chip-bg: rgba(255,255,255,.95); --chip-line: rgba(14,28,43,.22);
   --f-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
@@ -24,16 +24,16 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-  --bg: #060C13; --bg-a: #1B5F99; --bg-b: #86570F; --bg-c: #0E6B5B;
+  --bg: #060C13; --bg-a: #1B5F99; --bg-b: #17306B; --bg-c: #0E3F7A;
   --glass: rgba(20,33,49,.54); --glass-2: rgba(255,255,255,.06); --glass-hi: rgba(24,38,56,.86); --glass-solid: #121E2C;
   --glass-line: rgba(255,255,255,.15); --line: rgba(255,255,255,.12);
   --shadow: 0 14px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.09);
   --sel-glow: 0 16px 48px rgba(94,169,242,.22);
   --ink: #E9EFF6; --muted: #9AABBD;
   --accent: #66B0F5; --accent-ink: #07121D; --accent-soft: rgba(102,176,245,.16);
-  --board-a: rgba(4,10,17,.88); --board-b: rgba(14,32,52,.78); --board-ink: #F2F5F8; --board-amber: #FFB938;
+  --board-a: rgba(10,40,90,.9); --board-b: rgba(24,86,160,.8); --board-ink: #F2F7FF; --board-amber: #A9D3FF;
   --warn: #F0B04E; --warn-soft: rgba(240,176,78,.18); --bad: #FF8F86;
-  --leg-a: #5EA9F2; --leg-b: #FF9A5C; --leg-c: #55C285; --leg-d: #C79BFF;
+  --leg-a: #5EA9F2; --leg-b: #9BD0FF; --leg-c: #8C96FF; --leg-d: #4FD0E6;
   --sea-a: #0B1A2A; --sea-b: #08131F; --land: #162739; --state: #2B4259; --coast: #4C7BA3; --coast-glow: rgba(94,169,242,.18);
   --grat: rgba(255,255,255,.07); --rail: #3E5A75; --state-lbl: #5F7A93; --city: #7E97AF; --route-casing: #0A1520;
   --chip-bg: rgba(14,26,40,.94); --chip-line: rgba(255,255,255,.22);
@@ -41,22 +41,31 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #060C13; --bg-a: #1B5F99; --bg-b: #86570F; --bg-c: #0E6B5B;
+  --bg: #060C13; --bg-a: #1B5F99; --bg-b: #17306B; --bg-c: #0E3F7A;
   --glass: rgba(20,33,49,.54); --glass-2: rgba(255,255,255,.06); --glass-hi: rgba(24,38,56,.86); --glass-solid: #121E2C;
   --glass-line: rgba(255,255,255,.15); --line: rgba(255,255,255,.12);
   --shadow: 0 14px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.09);
   --sel-glow: 0 16px 48px rgba(94,169,242,.22);
   --ink: #E9EFF6; --muted: #9AABBD;
   --accent: #66B0F5; --accent-ink: #07121D; --accent-soft: rgba(102,176,245,.16);
-  --board-a: rgba(4,10,17,.88); --board-b: rgba(14,32,52,.78); --board-ink: #F2F5F8; --board-amber: #FFB938;
+  --board-a: rgba(10,40,90,.9); --board-b: rgba(24,86,160,.8); --board-ink: #F2F7FF; --board-amber: #A9D3FF;
   --warn: #F0B04E; --warn-soft: rgba(240,176,78,.18); --bad: #FF8F86;
-  --leg-a: #5EA9F2; --leg-b: #FF9A5C; --leg-c: #55C285; --leg-d: #C79BFF;
+  --leg-a: #5EA9F2; --leg-b: #9BD0FF; --leg-c: #8C96FF; --leg-d: #4FD0E6;
   --sea-a: #0B1A2A; --sea-b: #08131F; --land: #162739; --state: #2B4259; --coast: #4C7BA3; --coast-glow: rgba(94,169,242,.18);
   --grat: rgba(255,255,255,.07); --rail: #3E5A75; --state-lbl: #5F7A93; --city: #7E97AF; --route-casing: #0A1520;
   --chip-bg: rgba(14,26,40,.94); --chip-line: rgba(255,255,255,.22);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+.ic { width: 1.15em; height: 1.15em; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -.2em; }
+.ic-lg { width: 1.6em; height: 1.6em; }
+.field label, .tab, .viewmap, .copy, .go, .btn, .more, .chip, .hub button, .opts summary, .mapctl button, .chg, .fare, .meta, .counts { display: inline-flex; align-items: center; gap: 6px; }
+.field label { display: flex; }
+.top h1 { display: flex; align-items: center; gap: 12px; }
+.top h1 .ic { width: 1.05em; height: 1.05em; color: var(--accent); background: var(--accent-soft); border-radius: 12px; padding: 6px; box-sizing: content-box; }
+.board .route { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; }
+.board .route i .ic { width: .8em; height: .8em; vertical-align: -.05em; }
+.board .meta { display: inline-flex; gap: 6px; align-items: center; }
 body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
 .bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
@@ -100,8 +109,7 @@ button, input, select { font: inherit; color: inherit; }
 .opts { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; }
 .opts summary { cursor: pointer; font-weight: 600; color: var(--muted); list-style: none; display: inline-flex; gap: 6px; align-items: center; }
 .opts summary::-webkit-details-marker { display: none; }
-.opts summary::before { content: "+"; font-family: var(--f-data); width: 14px; }
-.opts[open] summary::before { content: "−"; }
+.opts[open] summary .ic-chev { transform: rotate(180deg); }
 .optgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 12px; }
 .opt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .rates { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; }
@@ -150,6 +158,7 @@ button, input, select { font: inherit; color: inherit; }
 .run { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); gap: 10px; align-items: center; }
 .stop { display: flex; flex-direction: column; min-width: 0; }
 .stop.end { text-align: right; }
+.stop .ic { color: var(--accent); }
 .tm { font-family: var(--f-data); font-weight: 500; font-size: 20px; line-height: 1.1; }
 .dt { font-size: 12.5px; color: var(--muted); }
 .sn { font-weight: 600; overflow-wrap: anywhere; }
@@ -254,16 +263,42 @@ button, input, select { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-train" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="14" rx="3"/><path d="M4 11h16M8 21l2-4M16 21l-2-4"/><circle cx="8.5" cy="14" r=".6"/><circle cx="15.5" cy="14" r=".6"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-rupee" viewBox="0 0 24 24"><path d="M6 3h12M6 8h12M6 13h4a4 4 0 0 0 0-10M10 13l7 8"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M9 19h7a4 4 0 0 0 0-8H8a4 4 0 0 1 0-8h7"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-seat" viewBox="0 0 24 24"><path d="M5 11V7a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4M3 11a2 2 0 0 1 2 2v3h14v-3a2 2 0 1 1 4 0v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM5 20v2M19 20v2"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="m10.3 3.9-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-hub" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="m7 7 3 3M17 7l-3 3M7 17l3-3M17 17l-3-3"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7zM2 12l10 5 10-5M2 17l10 5 10-5"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></symbol>
+</defs></svg>
 <div class="bg" aria-hidden="true"></div>
 <main class="wrap">
   <header class="top">
-    <h1>Interchange Finder</h1>
+    <h1><svg class="ic" aria-hidden="true"><use href="#i-train"/></svg>Interchange Finder</h1>
     <p>Pick two stations and a date. When no train runs the whole way, this lists the stations where you change trains, with every connection timed from the Railway Board's 2026 timetable.</p>
   </header>
 
   <form class="search" id="form" autocomplete="off">
     <div class="field from">
-      <label for="from">From</label>
+      <label for="from"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>From</label>
       <input id="from" type="text" role="combobox" aria-expanded="false" aria-controls="from-list" aria-autocomplete="list" placeholder="City or station" spellcheck="false">
       <ul class="sugg" id="from-list" role="listbox" hidden></ul>
     </div>
@@ -271,18 +306,18 @@ button, input, select { font: inherit; color: inherit; }
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
     </button>
     <div class="field to">
-      <label for="to">To</label>
+      <label for="to"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>To</label>
       <input id="to" type="text" role="combobox" aria-expanded="false" aria-controls="to-list" aria-autocomplete="list" placeholder="City or station" spellcheck="false">
       <ul class="sugg" id="to-list" role="listbox" hidden></ul>
     </div>
     <div class="field datef">
-      <label for="date">Travel date</label>
+      <label for="date"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Travel date</label>
       <input id="date" type="date">
     </div>
-    <button type="submit" class="go" id="go">Find routes</button>
+    <button type="submit" class="go" id="go"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>Find routes</button>
 
     <details class="opts" id="opts">
-      <summary>Options</summary>
+      <summary><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg>Options<svg class="ic ic-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
       <div class="optgrid">
         <div class="opt"><label for="o-changes">Most changes</label>
           <select id="o-changes"><option value="1">1 change</option><option value="2" selected>2 changes</option><option value="3">3 changes (slower)</option></select></div>
@@ -542,6 +577,7 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
   var DATA = JSON.parse(document.getElementById('data').textContent);
   var E = createEngine(DATA);
   var $ = function (id) { return document.getElementById(id); };
+  function ic(n, c) { return '<svg class="ic' + (c ? ' ' + c : '') + '" aria-hidden="true"><use href="#i-' + n + '"/></svg>'; }
   var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
@@ -626,9 +662,9 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
     var t0 = tm(it.dep), t1 = tm(it.arr);
     var via = it.legs.slice(1).map(function (l) { return l.from.name; });
     var sel = (n === state.selIdx);
-    var h = '<article class="trip' + (sel ? ' sel' : '') + '" data-n="' + n + '"><div class="trip-h"><span class="dur">' + dur(it.dur) + '</span><span class="chg">' + (it.changes === 0 ? 'Direct train' : it.changes + (it.changes === 1 ? ' change' : ' changes')) + '</span>' +
-      '<span class="fare">' + (it.fare != null ? '<small>about</small>' + inr(it.fare) : '<small>fare</small>not available') + '</span>' +
-      '<button type="button" class="viewmap" data-sel="' + n + '" aria-pressed="' + sel + '">' + (sel ? 'On map' : 'Show on map') + '</button><button type="button" class="copy" data-n="' + n + '">Copy</button></div>' +
+    var h = '<article class="trip' + (sel ? ' sel' : '') + '" data-n="' + n + '"><div class="trip-h"><span class="dur">' + dur(it.dur) + '</span><span class="chg">' + ic(it.changes === 0 ? 'train' : 'route') + (it.changes === 0 ? 'Direct train' : it.changes + (it.changes === 1 ? ' change' : ' changes')) + '</span>' +
+      '<span class="fare">' + ic('rupee') + (it.fare != null ? '<small>about</small>' + inr(it.fare) : '<small>fare</small>not available') + '</span>' +
+      '<button type="button" class="viewmap" data-sel="' + n + '" aria-pressed="' + sel + '">' + ic('map') + (sel ? 'On map' : 'Show on map') + '</button><button type="button" class="copy" data-n="' + n + '">' + ic('copy') + '<span>Copy</span></button></div>' +
       '<div class="trip-body"><div class="trip-main"><p class="trip-sub">' + t0.d + ' ' + t0.t + ' → ' + t1.d + ' ' + t1.t + (via.length ? ' · change at ' + esc(via.join(', ')) : '') + '</p><ol class="legs">';
     var warn = {};
     it.legs.forEach(function (l, k) {
@@ -658,7 +694,7 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
 
   var MAPBOX = '<div class="mapbox"><svg class="mapsvg" id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of the selected route"><g id="base"></g><g id="rl"></g></svg>' +
     '<div class="mapscale"><span id="mapscale-t">200 km</span><i id="mapscale-b"></i></div>' +
-    '<div class="mapctl"><button type="button" data-act="in" aria-label="Zoom in">+</button><button type="button" data-act="out" aria-label="Zoom out">&minus;</button><button type="button" data-act="fit" aria-label="Fit the route">Fit</button></div>' +
+    '<div class="mapctl"><button type="button" data-act="in" aria-label="Zoom in">' + ic('plus') + '</button><button type="button" data-act="out" aria-label="Zoom out">' + ic('minus') + '</button><button type="button" data-act="fit" aria-label="Fit the route">' + ic('fit') + '</button></div>' +
     '<div class="mapcap" id="mapcap">A start, B end, numbers are changes. Drag to pan, Ctrl + scroll to zoom.</div></div>';
 
   function viaHTML(l) {
@@ -687,17 +723,17 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
   function render() {
     var out = $('out'), r = state.res, a = state.args, sy = window.pageYOffset || 0;
     var t = tm(r.t0 === undefined ? 0 : a ? E.dayNum(a.date) * 1440 : 0);
-    var head = '<div class="board"><div class="route">' + esc(state.from.label.replace(/ \([A-Z0-9]+\)$/, '')) + '<i>→</i>' + esc(state.to.label.replace(/ \([A-Z0-9]+\)$/, '')) + '</div><div class="meta">' + t.d + ' ' + a.date.slice(0, 4) + ' · ' + r.count.toLocaleString('en-IN') + ' options · ' + state.ms + ' ms</div></div>';
+    var head = '<div class="board"><div class="route">' + esc(state.from.label.replace(/ \([A-Z0-9]+\)$/, '')) + '<i>' + ic('arrow') + '</i>' + esc(state.to.label.replace(/ \([A-Z0-9]+\)$/, '')) + '</div><div class="meta">' + ic('cal') + t.d + ' ' + a.date.slice(0, 4) + ' · ' + r.count.toLocaleString('en-IN') + ' options · ' + state.ms + ' ms</div></div>';
     if (!r.count) { out.innerHTML = head + noRoute(); wireOut(); return; }
     var by = {}; r.its.forEach(function (i) { by[i.changes] = (by[i.changes] || 0) + 1; });
     var counts = '<div class="counts">' + [0,1,2,3].filter(function (c) { return by[c]; }).map(function (c) { return '<span><b>' + by[c].toLocaleString('en-IN') + '</b> ' + (c === 0 ? 'direct' : 'with ' + c + (c === 1 ? ' change' : ' changes')) + '</span>'; }).join('') + (r.capped ? '<span>Search stopped early, so some options are missing.</span>' : '') + '</div>';
-    var tabs = '<div class="tabs" role="tablist">' + [['fastest','Fastest'],['cheapest','Cheapest'],['fewest','Fewest changes'],['hubs','Interchange stations']].map(function (x) { return '<button class="tab" role="tab" data-tab="' + x[0] + '" aria-selected="' + (state.tab === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>';
+    var tabs = '<div class="tabs" role="tablist">' + [['fastest','Fastest','zap'],['cheapest','Cheapest','rupee'],['fewest','Fewest changes','layers'],['hubs','Interchange stations','hub']].map(function (x) { return '<button class="tab" role="tab" data-tab="' + x[0] + '" aria-selected="' + (state.tab === x[0]) + '">' + ic(x[2]) + x[1] + '</button>'; }).join('') + '</div>';
     var body = '';
-    var chip = state.via !== null ? '<div class="chips"><button class="chip" data-clear="1">Via ' + esc(E.ST[state.via].name) + ' &times;</button></div>' : '';
+    var chip = state.via !== null ? '<div class="chips"><button class="chip" data-clear="1">Via ' + esc(E.ST[state.via].name) + ic('x') + '</button></div>' : '';
     if (state.tab === 'hubs') {
       var hs = E.hubs(r.its);
       body = '<p class="counts">Stations where you could change trains, ranked by how many one-change routes use them.</p><div class="hubs">' + hs.map(function (h) {
-        return '<div class="hub"><h3>' + esc(h.st.name) + '<i>' + esc(h.st.code) + '</i></h3><dl><dt>One-change routes</dt><dd>' + h.single + '</dd><dt>All routes using it</dt><dd>' + h.count.toLocaleString('en-IN') + '</dd><dt>Best total time</dt><dd>' + dur(h.best) + '</dd><dt>Lowest fare</dt><dd>' + (isFinite(h.bestFare) ? inr(h.bestFare) : 'n/a') + '</dd></dl><button type="button" data-via="' + h.st.i + '">Show routes via here</button></div>';
+        return '<div class="hub"><h3>' + esc(h.st.name) + '<i>' + esc(h.st.code) + '</i></h3><dl><dt>One-change routes</dt><dd>' + h.single + '</dd><dt>All routes using it</dt><dd>' + h.count.toLocaleString('en-IN') + '</dd><dt>Best total time</dt><dd>' + dur(h.best) + '</dd><dt>Lowest fare</dt><dd>' + (isFinite(h.bestFare) ? inr(h.bestFare) : 'n/a') + '</dd></dl><button type="button" data-via="' + h.st.i + '">' + ic('route') + 'Show routes via here</button></div>';
       }).join('') + '</div>';
     } else {
       var all = visibleItineraries();
@@ -740,7 +776,7 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
     return L.join('\n');
   }
   function copyText(s, btn) {
-    function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(function () { btn.textContent = o; }, 1400); }
+    function done(ok) { var o = btn.innerHTML; btn.innerHTML = ic(ok ? 'check' : 'copy') + '<span>' + (ok ? 'Copied' : 'Select and copy') + '</span>'; setTimeout(function () { btn.innerHTML = o; }, 1400); }
     function fallback() { var ta = document.createElement('textarea'); ta.value = s; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(ok); }
     try { navigator.clipboard.writeText(s).then(function () { done(true); }, fallback); } catch (e) { fallback(); }
   }
