@@ -168,6 +168,10 @@ button, input, select { font: inherit; color: inherit; }
 .cls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
 .cls span { font-family: var(--f-data); font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 0 7px; background: var(--glass-2); }
 .cls span.pick { border-color: var(--accent); color: var(--accent); font-weight: 500; background: var(--accent-soft); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.links a { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--accent); color: var(--accent); border-radius: 9px; padding: 5px 11px; font-size: 13px; font-weight: 600; text-decoration: none; }
+.links a:hover { background: var(--accent-soft); }
+.lk-note { font-family: var(--f-data); font-size: 12px; color: var(--muted); }
 .gap { margin: 2px 0; padding: 9px 13px; border-radius: 12px; background: var(--glass-2); border: 1px solid var(--line); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 2px 14px; }
 .gap b { font-weight: 600; }
 .gap.tight { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
@@ -344,7 +348,7 @@ button, input, select { font: inherit; color: inherit; }
   <details class="about">
     <summary>About this data</summary>
     <p id="aboutdata"></p>
-    <p>Seat availability and live running status are not included in this version. The map joins station coordinates stop by stop, so lines are approximate and not the exact track; the faint grey lines are every train's printed stops. State boundaries come from the open india-maps-data set by udit-001 (district boundaries, merged into states and simplified), so they are indicative only. Times are the printed timetable times, so a train that has been retimed since will differ. Each leg is a separate ticket, so a missed connection is not covered; keep waits of 90 minutes or more where you can. Check IRCTC or NTES before you book. Stations that the timetable does not print cannot be searched; if your destination is missing, pick the nearest big station and add a bus or taxi leg.</p>
+    <p>Seat availability is not shown here: each train has a Check seats link that opens ConfirmTkt, where you pick the stations and date, and a link to IRCTC to book. Live running status is not included. The map joins station coordinates stop by stop, so lines are approximate and not the exact track; the faint grey lines are every train's printed stops. State boundaries come from the open india-maps-data set by udit-001 (district boundaries, merged into states and simplified), so they are indicative only. Times are the printed timetable times, so a train that has been retimed since will differ. Each leg is a separate ticket, so a missed connection is not covered; keep waits of 90 minutes or more where you can. Check IRCTC or NTES before you book. Stations that the timetable does not print cannot be searched; if your destination is missing, pick the nearest big station and add a bus or taxi leg.</p>
   </details>
 </main>
 
@@ -462,7 +466,10 @@ button, input, select { font: inherit; color: inherit; }
         '<div class="track"><span>' + dur(l.arr - l.dep) + '</span><span>' + (l.km != null ? '~' + l.km + ' km' : '') + '</span></div>' +
         '<div class="stop end"><span class="tm">' + d1.t + '</span><span class="dt">' + d1.d + '</span><span class="sn">' + esc(l.to.name) + '<i>' + esc(l.to.code) + '</i></span></div></div>' +
         '<div class="cls">' + (l.classes.length ? l.classes.map(function (c) { return '<span class="' + (c === l.cls ? 'pick' : '') + '">' + c + '</span>'; }).join('') : '<span>classes not listed</span>') +
-        (l.fare != null ? ' <span>' + l.cls + ' about ' + inr(l.fare) + '</span>' : '') + '</div>' + viaHTML(l) + '</li>';
+        (l.fare != null ? ' <span>' + l.cls + ' about ' + inr(l.fare) + '</span>' : '') + '</div>' +
+        '<div class="links"><a href="https://www.confirmtkt.com/train-seat-availability/' + l.n + '" target="_blank" rel="noopener noreferrer" title="Opens ConfirmTkt: pick ' + esc(l.from.code) + ' to ' + esc(l.to.code) + ' and the date">' + ic('seat') + 'Check seats</a>' +
+        '<a href="https://www.irctc.co.in/nget/train-search" target="_blank" rel="noopener noreferrer" title="Search ' + esc(l.from.code) + ' to ' + esc(l.to.code) + ' on IRCTC">' + ic('train') + 'Book on IRCTC</a>' +
+        '<span class="lk-note">' + esc(l.from.code) + ' to ' + esc(l.to.code) + ' · ' + l.n + '</span></div>' + viaHTML(l) + '</li>';
     });
     h += '</ol>';
     var notes = [];
