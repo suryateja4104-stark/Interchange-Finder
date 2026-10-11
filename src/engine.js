@@ -76,6 +76,12 @@ function createEngine(DATA) {
     return { cls, fare: Math.round(f / 5) * 5 };
   }
 
+  const ALIAS = {
+    goa: ['MAO', 'THVM', 'KRMI'], margao: ['MAO'], panaji: ['THVM', 'KRMI'], panjim: ['THVM', 'KRMI'],
+    bangalore: ['SBC', 'YPR', 'KJM', 'BNC'], bombay: ['CSMT', 'MMCT', 'DR', 'BDTS', 'TNA'], madras: ['MAS', 'MS'], calcutta: ['HWH', 'SDAH', 'KOAA', 'SRC'],
+    kochi: ['ERS', 'ERN', 'AWY'], cochin: ['ERS', 'ERN', 'AWY'], trivandrum: ['TVC'], mysore: ['MYS'], vizag: ['VSKP'], allahabad: ['PRYJ', 'PCOI'],
+    baroda: ['BRC'], poona: ['PUNE'], pondicherry: ['PDY'], gurugram: ['GGN']
+  };
   function stationSearch(q, limit = 8) {
     q = q.trim().toLowerCase(); if (!q) return [];
     const out = [];
@@ -86,6 +92,14 @@ function createEngine(DATA) {
       if (c === q) score = 0; else if (n === q) score = 0; else if (n.startsWith(q)) score = 1; else if (c.startsWith(q)) score = 2; else if (n.includes(q)) score = 4;
       if (score >= 0) out.push({ kind: 'station', label: `${s.name} (${s.code})`, ids: [s.i], score: score + Math.min(byStation[s.i].length, 400) * -0.001 });
     });
+    // common alternative names for cities whose stations carry a different name
+    for (const k in ALIAS) {
+      if (k.indexOf(q) !== 0 || q.length < 2) continue;
+      for (const code of ALIAS[k]) {
+        const i = byCode[code]; if (i === undefined || out.some(o => o.ids.length === 1 && o.ids[0] === i)) continue;
+        out.push({ kind: 'station', label: `${ST[i].name} (${ST[i].code})`, ids: [i], score: (k === q ? -1 : 1.2) + Math.min(byStation[i].length, 400) * -0.001 });
+      }
+    }
     out.sort((a, b) => a.score - b.score);
     return out.slice(0, limit);
   }
