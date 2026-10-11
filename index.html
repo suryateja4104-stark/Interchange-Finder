@@ -168,6 +168,24 @@ button, input, select { font: inherit; color: inherit; }
 .cls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
 .cls span { font-family: var(--f-data); font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 0 7px; background: var(--glass-2); }
 .cls span.pick { border-color: var(--accent); color: var(--accent); font-weight: 500; background: var(--accent-soft); }
+.near { border: 1px solid var(--glass-line); border-radius: 18px; padding: 0; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); color: var(--ink); background: var(--glass-solid); box-shadow: 0 24px 70px rgba(10,30,70,.35); overflow: hidden; }
+.near::backdrop { background: rgba(10,30,70,.38); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
+.near-in { display: flex; flex-direction: column; max-height: calc(100vh - 48px); }
+.near-h { padding: 18px 20px 12px; display: flex; gap: 12px; align-items: flex-start; }
+.near-h .ic { width: 38px; height: 38px; padding: 8px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); box-sizing: border-box; }
+.near-h h2 { margin: 0; font-family: var(--f-display); text-transform: uppercase; font-weight: 600; font-size: 24px; line-height: 1.1; }
+.near-h p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.near-l { list-style: none; margin: 0; padding: 0 14px 6px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.near-r { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--glass-2); }
+.near-r > div { flex: 1; min-width: 0; }
+.near-r b { display: block; overflow-wrap: anywhere; }
+.near-r b i { font-style: normal; font-family: var(--f-data); font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.near-m { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; color: var(--muted); margin-top: 3px; }
+.near-m span { display: inline-flex; align-items: center; gap: 5px; }
+.near-r button, .near-f button { border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: 9px; padding: 7px 14px; font-weight: 600; cursor: pointer; flex: none; }
+.near-f { padding: 10px 20px 16px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
+.near-f small { color: var(--muted); font-size: 12.5px; max-width: 38ch; }
+.near-f button { background: transparent; color: var(--accent); }
 .links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .links a { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--accent); color: var(--accent); border-radius: 9px; padding: 5px 11px; font-size: 13px; font-weight: 600; text-decoration: none; }
 .links a:hover { background: var(--accent-soft); }
@@ -300,7 +318,7 @@ button, input, select { font: inherit; color: inherit; }
     <p>Pick two stations and a date. When no train runs the whole way, this lists the stations where you change trains, with every connection timed from the Railway Board's 2026 timetable.</p>
   </header>
 
-  <form class="search" id="form" autocomplete="off">
+  <form class="search" id="form" autocomplete="off" novalidate>
     <div class="field from">
       <label for="from"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>From</label>
       <input id="from" type="text" role="combobox" aria-expanded="false" aria-controls="from-list" aria-autocomplete="list" placeholder="City or station" spellcheck="false">
@@ -344,6 +362,8 @@ button, input, select { font: inherit; color: inherit; }
   <section id="out" aria-live="polite">
     <div class="busy">Loading the 2026 timetable…</div>
   </section>
+
+  <dialog id="near" class="near" aria-labelledby="near-t"></dialog>
 
   <details class="about">
     <summary>About this data</summary>
@@ -605,7 +625,7 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
 
   /* rate inputs */
   var RATE_KEYS = ['2S','SL','3A','2A','CC','1A','EC'];
-  $('rates').innerHTML = RATE_KEYS.map(function (k) { return '<div class="opt"><label for="r-' + k + '">' + k + ' ₹/km</label><input id="r-' + k + '" type="number" min="0" step="0.05" value="' + E.DEFAULT_RATES[k] + '"></div>'; }).join('');
+  $('rates').innerHTML = RATE_KEYS.map(function (k) { return '<div class="opt"><label for="r-' + k + '">' + k + ' ₹/km</label><input id="r-' + k + '" type="number" min="0" step="any" value="' + E.DEFAULT_RATES[k] + '"></div>'; }).join('');
   function readOpts(forSave) {
     var rates = {}; RATE_KEYS.forEach(function (k) { var v = parseFloat($('r-' + k).value); if (!isNaN(v)) rates[k] = v; });
     return { maxChanges: +$('o-changes').value, minLayover: +$('o-min').value, minLayoverCity: +$('o-city').value, maxLayoverH: +$('o-max').value, windowH: +$('o-win').value, basis: $('o-basis').value, rates: rates };
@@ -616,16 +636,59 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
     if (o.rates) RATE_KEYS.forEach(function (k) { if (o.rates[k] !== undefined) $('r-' + k).value = o.rates[k]; });
   }
 
+
+  /* towns that have no railway station, with approximate coordinates, so a nearby railhead can be suggested */
+  var TOWNS = [
+    ['Mussoorie',30.46,78.07,1,[]],['Manali',32.24,77.19,1,[]],['Kullu',31.96,77.11,1,[]],['Kasol',32.01,77.31,1,[]],['Spiti (Kaza)',32.23,78.07,1,['Kaza','Spiti']],
+    ['Dharamshala',32.22,76.32,1,[]],['McLeod Ganj',32.24,76.32,1,['Mcleodganj']],['Dalhousie',32.54,75.97,1,[]],['Nainital',29.39,79.46,1,[]],
+    ['Almora',29.60,79.66,1,[]],['Ranikhet',29.64,79.43,1,[]],['Kausani',29.84,79.60,1,[]],['Lansdowne',29.84,78.68,1,[]],['Auli',30.53,79.57,1,[]],
+    ['Kedarnath',30.74,79.07,1,[]],['Badrinath',30.74,79.49,1,[]],['Leh',34.16,77.58,1,['Ladakh']],['Srinagar',34.08,74.80,1,[]],['Gulmarg',34.05,74.38,1,[]],
+    ['Pahalgam',34.02,75.32,1,[]],['Gangtok',27.33,88.61,1,[]],['Darjeeling',27.04,88.26,1,[]],['Kalimpong',27.06,88.47,1,[]],['Tawang',27.59,91.86,1,[]],
+    ['Munnar',10.09,77.06,1,[]],['Kodaikanal',10.24,77.49,1,[]],['Ooty (Udhagamandalam)',11.41,76.70,1,['Ooty','Udhagamandalam']],['Thekkady',9.60,77.17,1,['Periyar']],
+    ['Madikeri (Coorg)',12.42,75.74,1,['Madikeri','Coorg']],['Wayanad (Kalpetta)',11.61,76.08,1,['Wayanad','Kalpetta']],['Kovalam',8.40,76.98,0,[]],
+    ['Mahabaleshwar',17.92,73.66,1,[]],['Mount Abu',24.59,72.71,1,[]],['Pushkar',26.49,74.55,0,[]],['Hampi',15.34,76.46,0,[]],['Port Blair',11.62,92.73,0,[]]
+  ].map(function (t) { return { n: t[0], lat: t[1], lon: t[2], hill: !!t[3], a: t[4] }; });
+  function townMatches(q) {
+    q = q.trim().toLowerCase(); if (!q) return [];
+    return TOWNS.filter(function (t) { return t.n.toLowerCase().indexOf(q) === 0 || t.a.some(function (x) { return x.toLowerCase().indexOf(q) === 0; }) || (q.length > 3 && t.n.toLowerCase().indexOf(q) >= 0); });
+  }
+  function hav(a, b, c, d) { var r = Math.PI / 180, dl = (c - a) * r, dg = (d - b) * r, x = Math.sin(dl / 2) * Math.sin(dl / 2) + Math.cos(a * r) * Math.cos(c * r) * Math.sin(dg / 2) * Math.sin(dg / 2); return 12742 * Math.asin(Math.sqrt(x)); }
+  function lowService(it) { return !!it && it.ids.every(function (i) { return E.byStation[i].length < 4; }); }
+  var nearCtx = null;
+  function nearDialog(place, key, why) {
+    var cands = E.ST.filter(function (x) { return x.lat != null && E.byStation[x.i].length >= 20 && !(place.ids && place.ids.indexOf(x.i) >= 0); })
+      .map(function (x) { return { s: x, km: hav(place.lat, place.lon, x.lat, x.lon) }; }).sort(function (a, b) { return a.km - b.km; }).slice(0, 6);
+    var spd = place.hill ? 28 : 45;
+    nearCtx = { key: key, cands: cands };
+    var d = $('near');
+    d.innerHTML = '<div class="near-in"><div class="near-h">' + ic('train') + '<div><h2 id="near-t">No train from ' + esc(place.name) + '</h2><p>' + esc(why) + ' Pick a nearby station with regular trains and add the road leg yourself.</p></div></div>' +
+      '<ul class="near-l">' + cands.map(function (c, i) {
+        var road = Math.round(c.km * (place.hill ? 1.5 : 1.3)), mins = Math.round(road / spd * 60 / 5) * 5;
+        return '<li class="near-r"><div><b>' + esc(c.s.name) + '<i>' + esc(c.s.code) + '</i></b><div class="near-m"><span>' + ic('pin') + Math.round(c.km) + ' km straight line</span><span>' + ic('route') + 'about ' + road + ' km by road</span><span>' + ic('clock') + 'about ' + dur(mins) + '</span><span>' + ic('train') + E.byStation[c.s.i].length + ' trains stop</span></div></div><button type="button" data-use="' + i + '">Use</button></li>';
+      }).join('') + '</ul>' +
+      '<div class="near-f"><small>Road distance is the straight line plus ' + (place.hill ? '50%' : '30%') + ', at ' + spd + ' km/h' + (place.hill ? ' for hill roads' : '') + '. It is a rough guide, so check a map or bus app.</small><button type="button" data-close="1">Cancel</button></div></div>';
+    if (d.showModal) { if (!d.open) d.showModal(); } else d.setAttribute('open', '');
+  }
+  $('near').addEventListener('click', function (e) {
+    var d = $('near'), u = e.target.closest('[data-use]');
+    if (e.target === d || e.target.closest('[data-close]')) { d.close ? d.close() : d.removeAttribute('open'); return; }
+    if (!u || !nearCtx) return;
+    var c = nearCtx.cands[+u.dataset.use], it = { kind: 'station', label: c.s.name + ' (' + c.s.code + ')', ids: [c.s.i] };
+    (nearCtx.key === 'from' ? cFrom : cTo).set(it);
+    d.close ? d.close() : d.removeAttribute('open');
+    if (state.from && state.to) run(); else (nearCtx.key === 'from' ? $('to') : $('from')).focus();
+  });
+
   /* station pickers */
   function combo(key) {
     var input = $(key), list = $(key + '-list'), items = [], active = -1;
     function close() { list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; }
     function paint() {
-      list.innerHTML = items.map(function (it, i) { return '<li role="option" id="' + key + '-o' + i + '" data-i="' + i + '" aria-selected="' + (i === active) + '">' + esc(it.label) + (it.kind === 'cluster' ? '<small>city group</small>' : '') + '</li>'; }).join('');
+      list.innerHTML = items.map(function (it, i) { return '<li role="option" id="' + key + '-o' + i + '" data-i="' + i + '" aria-selected="' + (i === active) + '">' + esc(it.label) + (it.kind === 'cluster' ? '<small>city group</small>' : '') + (it.kind === 'town' ? '<small>no railway station</small>' : '') + '</li>'; }).join('');
       list.hidden = !items.length; input.setAttribute('aria-expanded', String(!!items.length));
     }
-    function pick(i) { var it = items[i]; if (!it) return; state[key] = it; input.value = it.label; close(); }
-    input.addEventListener('input', function () { state[key] = null; items = E.stationSearch(input.value, 8); active = items.length ? 0 : -1; paint(); });
+    function pick(i) { var it = items[i]; if (!it) return; input.value = it.label; close(); if (it.kind === 'town') { state[key] = null; nearDialog({ name: it.town.n, lat: it.town.lat, lon: it.town.lon, hill: it.town.hill }, key, it.town.n + ' has no railway station in this timetable.'); return; } state[key] = it; }
+    input.addEventListener('input', function () { state[key] = null; var st = E.stationSearch(input.value, 8), tw = townMatches(input.value).slice(0, 3).map(function (t) { return { kind: 'town', label: t.n, town: t }; }), q = input.value.trim().toLowerCase(); items = (tw.length && !(st[0] && st[0].label.toLowerCase().indexOf(q) === 0) ? tw.concat(st) : st.concat(tw)).slice(0, 8); active = items.length ? 0 : -1; paint(); });
     input.addEventListener('focus', function () { input.select(); });
     input.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowDown') { e.preventDefault(); if (items.length) { active = (active + 1) % items.length; paint(); } }
@@ -635,15 +698,21 @@ if (typeof module !== 'undefined') module.exports = { createEngine };
     });
     list.addEventListener('mousedown', function (e) { var li = e.target.closest('li'); if (li) { e.preventDefault(); pick(+li.dataset.i); } });
     input.addEventListener('blur', function () { setTimeout(close, 120); });
-    return { set: function (it) { state[key] = it; input.value = it ? it.label : ''; }, commit: function () { if (!state[key] && input.value.trim()) { var r = E.stationSearch(input.value, 1)[0]; if (r) { state[key] = r; input.value = r.label; } } } };
+    return { set: function (it) { state[key] = it; input.value = it ? it.label : ''; }, commit: function () { if (!state[key] && input.value.trim()) { var v = input.value.trim().toLowerCase(), r = E.stationSearch(input.value, 1)[0], t = townMatches(input.value)[0]; if (t && (!r || t.n.toLowerCase() === v || r.label.toLowerCase().indexOf(v) !== 0)) return t; if (r) { state[key] = r; input.value = r.label; } } return null; } };
   }
   var cFrom = combo('from'), cTo = combo('to');
   $('swap').addEventListener('click', function () { var a = state.from, b = state.to; cFrom.set(b); cTo.set(a); if (a && b) run(); });
 
   /* search */
   function run() {
-    cFrom.commit(); cTo.commit();
-    var out = $('out');
+    var tf = cFrom.commit(), tt = cTo.commit(), out = $('out');
+    var tk = tf ? 'from' : (tt ? 'to' : null), tw = tf || tt;
+    if (tw) { nearDialog({ name: tw.n, lat: tw.lat, lon: tw.lon, hill: tw.hill }, tk, tw.n + ' has no railway station in this timetable.'); return; }
+    var lk = lowService(state.from) ? 'from' : (lowService(state.to) ? 'to' : null);
+    if (lk && !state[lk].warned) {
+      var li = state[lk], ls = E.ST[li.ids[0]];
+      if (ls.lat != null) { li.warned = true; nearDialog({ name: ls.name, lat: ls.lat, lon: ls.lon, hill: false, ids: li.ids }, lk, 'Fewer than 4 trains stop at ' + ls.name + ' in this timetable.'); return; }
+    }
     if (!state.from || !state.to) { out.innerHTML = '<div class="panel"><h2>Choose both stations</h2><p>Start typing a city or station name, then pick it from the list.</p></div>'; return; }
     if (!$('date').value) { out.innerHTML = '<div class="panel"><h2>Choose a date</h2><p>Trains run on different days, so the date decides which connections exist.</p></div>'; return; }
     var o = readOpts();
