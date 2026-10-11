@@ -97,6 +97,6 @@ for t in d['trains']:
     v = t.get('valid')
     tr_out.append([t['n'], t['name'], t['type'] or '', ','.join(t['classes']) if t['classes'] else '', days,
                    to_mmdd(v['from']) if v else 0, to_mmdd(v['to']) if v else 0, ids, 1 if stops[0][3] is not None else 0])
-json.dump({'meta': {'id': d['meta']['id'], 'built_at': d['meta']['built_at'], 'name': d['meta']['name']}, 'st': st_out, 'tr': tr_out},
+json.dump({'meta': {'id': d['meta']['id'], 'built_at': d['meta']['built_at'], 'name': d['meta']['name'], 'upstream': sys.argv[3] if len(sys.argv) > 3 else ''}, 'st': st_out, 'tr': tr_out},
           open(out_path, 'w'), separators=(',', ':'))
 print('trains', len(tr_out), 'stations', len(st_out), dict(bad))

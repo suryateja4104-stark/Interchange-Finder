@@ -320,7 +320,8 @@ button, input, select { font: inherit; color: inherit; }
 </script>
 <script>
 (function () {
-  var E = createEngine(JSON.parse(document.getElementById('data').textContent));
+  var DATA = JSON.parse(document.getElementById('data').textContent);
+  var E = createEngine(DATA);
   var $ = function (id) { return document.getElementById(id); };
   var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -734,7 +735,7 @@ button, input, select { font: inherit; color: inherit; }
   var d = new Date(); d.setDate(d.getDate() + 3);
   $('date').value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   $('date').min = new Date().getFullYear() + '-' + pad(new Date().getMonth() + 1) + '-' + pad(new Date().getDate());
-  $('aboutdata').textContent = 'Timetable: Indian Railways Trains at a Glance 2026 (Railway Board), ' + E.TR.length.toLocaleString('en-IN') + ' trains across ' + E.ST.length + ' stations, parsed into the open railways-mcp dataset. Distances are not in the source, so fares are estimated from the length of each leg along the printed stops and the per-km rates in Options.';
+  $('aboutdata').textContent = 'Timetable: Indian Railways Trains at a Glance 2026 (Railway Board), ' + E.TR.length.toLocaleString('en-IN') + ' trains across ' + E.ST.length + ' stations, parsed into the open railways-mcp dataset. Distances are not in the source, so fares are estimated from the length of each leg along the printed stops and the per-km rates in Options. Timetable file built ' + String(DATA.meta.built_at || '').slice(0, 10) + (DATA.meta.upstream ? ' from upstream commit ' + DATA.meta.upstream : '') + '; a monthly job checks the source for updates.';
   setTimeout(run, 30);
 })();
 </script>

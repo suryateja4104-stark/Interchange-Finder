@@ -1,0 +1,39 @@
+name: Refresh timetable
+
+on:
+  schedule:
+    - cron: "23 3 1 * *"   # 03:23 UTC on the 1st of every month
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Rebuild even if the upstream data file is unchanged"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-timetable
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check upstream and rebuild if it changed
+        id: refresh
+        env:
+          FORCE: ${{ inputs.force && '1' || '' }}
+        run: scripts/refresh.sh
+
+      - name: Commit refreshed data
+        if: steps.refresh.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data index.html
+          git commit -m "Refresh timetable from upstream railways-mcp"
+          git push

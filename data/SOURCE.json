@@ -1,0 +1,10 @@
+{
+ "upstream": "https://github.com/shubhamyadav8901/railways-mcp",
+ "upstream_commit": "8857cf5",
+ "sha256": "378f112bdfafa73877d90fbcb4f54b19311d5bcb09a2e655a2022db072a7bf0c",
+ "files": [
+  "data/tag2026.json.gz",
+  "data/station_equivalences.json"
+ ],
+ "refreshed": "2026-10-11"
+}

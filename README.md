@@ -29,7 +29,10 @@ src/template.html       page markup, styles and UI code
 src/engine.js           route search and fare estimate
 data/timetable.json     compact timetable built from the 2026 source
 data/basemap.json       India outline and states in kilometres
-scripts/build.sh        rebuild the timetable and index.html
+scripts/build.sh        rebuild the timetable and index.html from the latest upstream file
+scripts/refresh.sh      change check used by the monthly job
+scripts/validate.js     sanity checks on the rebuilt data
+.github/workflows/      monthly refresh job
 scripts/build_basemap.sh rebuild the map outlines
 tests/engine_smoke.js   runs sample searches in Node
 ```
@@ -41,6 +44,19 @@ scripts/build.sh            # needs git and python3
 scripts/build_basemap.sh    # optional, needs node
 node tests/engine_smoke.js
 ```
+
+## Automatic refresh
+
+`.github/workflows/refresh-timetable.yml` runs on the 1st of every month (03:23 UTC) and can be started by hand from the Actions tab. It runs `scripts/refresh.sh`, which:
+
+1. clones the upstream railways-mcp project and hashes its timetable files,
+2. stops if the hash matches `data/SOURCE.json`,
+3. otherwise rebuilds `data/timetable.json` and `index.html`, runs `scripts/validate.js` (train and station counts, sample routes), and updates `data/SOURCE.json`,
+4. commits the result to `main`.
+
+If validation fails, the job fails and nothing is committed. GitHub emails the person who last edited the workflow when a scheduled run fails. Use "Run workflow" with "force" ticked to rebuild without an upstream change. GitHub pauses scheduled workflows in a repo with no activity for 60 days, so if the data stays unchanged for two months you may need to re-enable it in the Actions tab.
+
+This keeps the page as current as the upstream file. It does not add retimings that the upstream project has not published.
 
 ## Data sources and credits
 
